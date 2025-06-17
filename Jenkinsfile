@@ -49,7 +49,6 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                                     property=\$(echo \$data | jq -r '.key')
                                     valueJson=\$(echo \$data | jq -r '.value')
                                     
-                                    echo "🔧 Updating property: \$property = \$valueJson"
                                     curl -H "Authorization: Basic \$API_KEY" -H 'Content-Type: application/json' --request PUT \\
                                         --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics/\$topic/configs/\$property" \\
                                         -d "{\\\"value\\\": \\\"\$valueJson\\\"}"
