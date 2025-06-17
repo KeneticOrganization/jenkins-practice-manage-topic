@@ -47,32 +47,32 @@ properties([
                         } else if (Action == 'Create') {
                             return """
                                 <table><tr>
-                                <td><label>Topic Name : </label><input name='value' type='text' value='default-topic'></td>
-                                <td><label>Partitions : </label><input name='value' type='number' value='6'></td>
-                                <td><label>Cleanup Policy : </label>
+                                <td><label>Topic Name</label><input name='value' type='text' value='default-topic'></td>
+                                <td><label>Partitions</label><input name='value' type='number' value='6'></td>
+                                <td><label>Cleanup Policy</label>
                                 <select name='value'>
                                     <option value='compact'>Compact</option>
                                     <option value='compact,delete'>Compact & Delete</option>
                                     <option value='delete' selected>Delete</option>
                                 </select></td>
-                                <td><label>Retention Time (ms) : </label><input name='value' type='number' value='604800000'></td>
-                                <td><label>Retention Size (bytes) : </label><input name='value' type='number' value='-1'></td>
-                                <td><label>Max Message Bytes (bytes) : </label><input name='value' type='number' value='2097164'></td>
+                                <td><label>Retention Time (ms)</label><input name='value' type='number' value='604800000'></td>
+                                <td><label>Retention Size (bytes)</label><input name='value' type='number' value='-1'></td>
+                                <td><label>Max Message Bytes (bytes)</label><input name='value' type='number' value='2097164'></td>
                                 </tr></table>
                             """
                         } else if (Action == 'Update') {
                             return """
                                 <table><tr>
-                                <td><label>Topic Name : </label><input name='value' type='text' value='default-topic'></td>
-                                <td><label>Cleanup Policy : </label>
+                                <td><label>Topic Name</label><input name='value' type='text' value='default-topic'></td>
+                                <td><label>Cleanup Policy</label>
                                 <select name='value'>
                                     <option value='compact'>Compact</option>
                                     <option value='compact,delete'>Compact & Delete</option>
                                     <option value='delete' selected>Delete</option>
                                 </select></td>
-                                <td><label>Retention Time (ms) : </label><input name='value' type='number' value='604800000'></td>
-                                <td><label>Retention Size (bytes) : </label><input name='value' type='number' value='-1'></td>
-                                <td><label>Max Message Bytes (bytes) : </label><input name='value' type='number' value='2097164'></td>
+                                <td><label>Retention Time (ms)</label><input name='value' type='number' value='604800000'></td>
+                                <td><label>Retention Size (bytes)</label><input name='value' type='number' value='-1'></td>
+                                <td><label>Max Message Bytes (bytes)</label><input name='value' type='number' value='2097164'></td>
                                 </tr></table>
                             """
                         } else if (Action == 'MANAGE_TOPIC:ERROR') {
