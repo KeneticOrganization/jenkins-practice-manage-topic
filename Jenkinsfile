@@ -11,20 +11,18 @@ pipeline {
     stages {
         stage('Describe Topic'){
             steps{
-                steps{
-                    script{
-                        echo """
+                script{
+                    echo """
 Topic Name : ${params.TopicName}
-                        """
-                        sh ("""
-                            if curl -H "Authorization: Basic \${API_KEY}" --request GET --url "\${REST_ENDPOINT}/kafka/v3/clusters/\${CLUSTER_ID}/topics" | grep -c "${params.TopicName}" ; then
-                                RESPONSE=\$(curl -H "Authorization: Basic \${API_KEY}" --request GET --url "\${REST_ENDPOINT}/kafka/v3/clusters/\${CLUSTER_ID}/topics/${params.TopicName}")
-                                echo "\$RESPONSE" | jq '.data'
-                            else
-                                echo "Unknown topic \"${params.TopicName}\"."
-                            fi
-                        """)
-                    }
+                    """
+                    sh ("""
+                        if curl -H "Authorization: Basic \${API_KEY}" --request GET --url "\${REST_ENDPOINT}/kafka/v3/clusters/\${CLUSTER_ID}/topics" | grep -c "${params.TopicName}" ; then
+                            RESPONSE=\$(curl -H "Authorization: Basic \${API_KEY}" --request GET --url "\${REST_ENDPOINT}/kafka/v3/clusters/\${CLUSTER_ID}/topics/${params.TopicName}")
+                            echo "\$RESPONSE" | jq '.data'
+                        else
+                            echo "Unknown topic \"${params.TopicName}\"."
+                        fi
+                    """)
                 }
             }
         }
