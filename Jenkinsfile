@@ -31,5 +31,19 @@ pipeline {
                 }
             }
         }
+        
+        stage('Update Topic Testing'){
+            steps{
+                script{
+                    build job: 'Jenkins Practice/jenkins-practice-manage-topic/update-topic', parameters: [
+                        string(name: 'TopicName', value: 'test-topic'), 
+                        string(name: 'CleanupPolicy', value: 'Delete'), 
+                        string(name: 'RetentionTime', value: '259200000'), 
+                        string(name: 'RetentionSize', value: '-1'), 
+                        string(name: 'MaxMessageBytes', value: '2097164')
+                    ]
+                }
+            }
+        }
     }
 }
