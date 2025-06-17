@@ -9,7 +9,7 @@ pipeline {
         stage('List Topic'){
             steps{
                 script{
-                    def responseJson = sh(
+                    def listResult = sh(
                         script: '''
                             RESPONSE=$(curl -s -H "Authorization: Basic $API_KEY" --request GET --url "$REST_ENDPOINT/kafka/v3/clusters/$CLUSTER_ID/topics")
                             echo "$RESPONSE" | jq '.data'
@@ -17,7 +17,9 @@ pipeline {
                         returnStdout: true
                     ).trim()
                     
-                    echo "${responseJson}"
+                    echo "${listResult}"
+                    writeFile file: 'list_result.txt', text: listResult
+                    archiveArtifacts artifacts: 'list_result.txt'
                 }
             }
         }
