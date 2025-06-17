@@ -1,3 +1,4 @@
+properties([])
 pipeline {
     agent any
     environment {
