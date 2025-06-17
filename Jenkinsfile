@@ -6,7 +6,7 @@ pipeline {
         CLUSTER_ID = 'lkc-yjvgnk'
     }
     stages {
-        stage('Create Topic'){
+        stage('List Topic'){
             steps{
                 script{
                     def responseJson = sh(
