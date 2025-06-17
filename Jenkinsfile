@@ -7,16 +7,15 @@ pipeline {
     }
     parameters {
         string(name: 'TopicName', defaultValue: 'default-topic', description: 'String')
-        string(name: 'Partitions', defaultValue: '6', description: 'Integer')
         choice(name: 'CleanupPolicy', choices: [
-            'Compact', 'Delete', 'Compact & Delete'
+            'Compact', 'Delete'
             ], description: '')
         string(name: 'RetentionTime', defaultValue: '604800000', description: 'Milli seconds')
         string(name: 'RetentionSize', defaultValue: '-1', description: 'Bytes')
         string(name: 'MaxMessageBytes', defaultValue: '2097164', description: 'Bytes')
     }
     stages {
-        stage('Create Topic'){
+        stage('Update Topic'){
             steps{
                 script{
                     def cleanPolicy = ""
@@ -26,35 +25,31 @@ pipeline {
                     else if (params.CleanupPolicy == "Delete"){
                         cleanPolicy = "delete"
                     }
-                    else if (params.CleanupPolicy == "Compact & Delete") {
-                        cleanPolicy = "compact,delete"
-                    }
                     echo """
 Topic Name : ${params.TopicName}
-Partition : ${params.Partitions}
 Cleanup Policy : ${cleanPolicy}
 Retention Time (ms) : ${params.RetentionTime}
 Retention Size (bytes) : ${params.RetentionSize}
 Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
+                    def updateJson = """{
+                        \\"${params.TopicName}\\": {
+                        \\"retention.ms\\": ${params.RetentionTime},
+                        \\"retention.bytes\\": ${params.RetentionSize},
+                        \\"max.message.bytes\\": ${params.MaxMessageBytes},
+                        \\"cleanup.policy\\": \\"${cleanPolicy}\\"
+                        }
+                    }"""
+
                     sh("""
-                        if ! curl -H "Authorization: Basic \$API_KEY" --request GET --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" | grep -c "${params.TopicName}" ; then
-                            curl -H "Authorization: Basic \$API_KEY" -H 'Content-Type: application/json' --request POST --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" \
-                            -d "{
-                                \\"topic_name\\":\\"${params.TopicName}\\",
-                                \\"partitions_count\\":\\"${params.Partitions}\\",
-                                \\"configs\\": [
-                                    { \\"name\\": \\"cleanup.policy\\", \\"value\\": \\"${cleanPolicy}\\" },
-                                    { \\"name\\": \\"retention.ms\\", \\"value\\": ${params.RetentionTime} },
-                                    { \\"name\\": \\"retention.bytes\\", \\"value\\": ${params.RetentionSize} },
-                                    { \\"name\\": \\"max.message.bytes\\", \\"value\\": ${params.MaxMessageBytes} }
-                                ]
-                            }"
+                        echo "${updateJson}" | jq -r 'to_entries[] | "\\(.key) \\(.value | to_entries[] )"' | while read topic data; do
+                            property=\$(echo \$data | jq -r '.key')
+                            valueJson=\$(echo \$data | jq -r '.value')
                             
-                            echo "Successful created topic name \"${params.TopicName}\"."
-                        else
-                            echo "Already has topic name \"${params.TopicName}\"."
-                        fi
+                            curl -H "Authorization: Basic \$API_KEY" -H 'Content-Type: application/json' --request PUT \\
+                                --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics/\$topic/configs/\$property" \\
+                                -d "{\\\"value\\\": \\\"\$valueJson\\\"}"
+                        done
                     """)
                 }
             }
