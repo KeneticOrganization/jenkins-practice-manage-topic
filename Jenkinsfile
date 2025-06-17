@@ -154,25 +154,14 @@ Retention Time (ms) : ${values[3]}
 Retention Size (bytes) : ${values[4]}
 Max Message Bytes (bytes) : ${values[5]}
                             """
-                            sh("""
-                                if ! curl -H "Authorization: Basic \$API_KEY" --request GET --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" | grep -c "${values[0]}" ; then
-                                    curl -H "Authorization: Basic \$API_KEY" -H 'Content-Type: application/json' --request POST --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" \
-                                    -d "{
-                                        \\"topic_name\\":\\"${values[0]}\\",
-                                        \\"partitions_count\\":\\"${values[1]}\\",
-                                        \\"configs\\": [
-                                            { \\"name\\": \\"cleanup.policy\\", \\"value\\": \\"${values[2]}\\" },
-                                            { \\"name\\": \\"retention.ms\\", \\"value\\": ${values[3]} },
-                                            { \\"name\\": \\"retention.bytes\\", \\"value\\": ${values[4]} },
-                                            { \\"name\\": \\"max.message.bytes\\", \\"value\\": ${values[5]} }
-                                        ]
-                                    }"
-                                    
-                                    echo "Successful created topic name \"${values[0]}\"."
-                                else
-                                    echo "Already has topic name \"${values[0]}\"."
-                                fi
-                            """)
+                            build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-topic-Jenkins', parameters: [
+                                string(name: 'TopicName', value: "test-topic"), 
+                                string(name: 'Partitions', value: '6'), 
+                                string(name: 'CleanupPolicy', value: 'Compact'), 
+                                string(name: 'RetentionTime', value: '604800000'), 
+                                string(name: 'RetentionSize', value: '-1'), 
+                                string(name: 'MaxMessageBytes', value: '2097164')
+                            ]
                         }
                     }
                 }
