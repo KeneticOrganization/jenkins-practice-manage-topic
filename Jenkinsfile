@@ -1,4 +1,3 @@
-properties([])
 pipeline {
     agent any
     environment {
@@ -21,13 +20,13 @@ pipeline {
             steps{
                 script{
                     def cleanPolicy = ""
-                    if (CleanupPolicy == "Compact") {
+                    if (params.CleanupPolicy == "Compact") {
                         cleanPolicy = "compact"
                     } 
-                    else if (CleanupPolicy == "Delete"){
+                    else if (params.CleanupPolicy == "Delete"){
                         cleanPolicy = "delete"
                     }
-                    else if (CleanupPolicy == "Compact & Delete") {
+                    else if (params.CleanupPolicy == "Compact & Delete") {
                         cleanPolicy = "compact,delete"
                     }
                     sh("""
