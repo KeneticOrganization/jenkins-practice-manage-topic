@@ -27,7 +27,7 @@ pipeline {
                     def childBuild = build job: 'Jenkins Practice/jenkins-practice-manage-topic/describe-topic', parameters: [
                         string(name: 'TopicName', value: 'test-topic')
                     ]
-                    echo childBuild
+                    echo "${childBuild}"
                 }
             }
         }
