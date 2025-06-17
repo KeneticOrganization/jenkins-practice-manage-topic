@@ -21,13 +21,20 @@ pipeline {
             }
         }
 
+        stage('List Topic Testing'){
+            steps{
+                script{
+                    build job: 'Jenkins Practice/jenkins-practice-manage-topic/list-topic'
+                }
+            }
+        }
+
         stage('Describe Topic Testing'){
             steps{
                 script{
-                    def childBuild = build job: 'Jenkins Practice/jenkins-practice-manage-topic/describe-topic', parameters: [
+                    build job: 'Jenkins Practice/jenkins-practice-manage-topic/describe-topic', parameters: [
                         string(name: 'TopicName', value: 'test-topic')
                     ]
-                    echo "${childBuild}"
                 }
             }
         }
@@ -41,6 +48,16 @@ pipeline {
                         string(name: 'RetentionTime', value: '259200000'), 
                         string(name: 'RetentionSize', value: '-1'), 
                         string(name: 'MaxMessageBytes', value: '2097164')
+                    ]
+                }
+            }
+        }
+        
+        stage('Delete Topic Testing'){
+            steps{
+                script{
+                    build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-topic', parameters: [
+                        string(name: 'TopicName', value: 'test-topic')
                     ]
                 }
             }
