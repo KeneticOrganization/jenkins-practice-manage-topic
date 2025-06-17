@@ -185,7 +185,7 @@ Max Message Bytes (bytes) : ${values[5]}
                             def option = "${Option}"
                             def values = option.split(',').collect { it.trim() }.findAll { it }
                             if (values[2] == 'delete') {
-                                values[1] = "${values[2]},${values[3]}"
+                                values[1] = "${values[1]},${values[2]}"
                                 
                                 values[2] = values[3]
                                 values[3] = values[4]
