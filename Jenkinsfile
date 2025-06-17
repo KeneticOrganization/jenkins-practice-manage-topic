@@ -21,7 +21,7 @@ pipeline {
                     copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'create_result.txt')
 
                     def output = readFile('create_result.txt').trim()
-                    echo "Describe output: ${output}"
+                    echo "Creating output: ${output}"
                 }
             }
         }
