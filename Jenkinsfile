@@ -37,25 +37,31 @@ Retention Time (ms) : ${params.RetentionTime}
 Retention Size (bytes) : ${params.RetentionSize}
 Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
-                    sh("""
-                        if ! curl -H "Authorization: Basic \$API_KEY" --request GET --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" | grep -c "${params.TopicName}" ; then
-                            curl -H "Authorization: Basic \$API_KEY" -H 'Content-Type: application/json' --request POST --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" \
-                            -d "{
-                                \\"topic_name\\":\\"${params.TopicName}\\",
-                                \\"partitions_count\\":\\"${params.Partitions}\\",
-                                \\"configs\\": [
-                                    { \\"name\\": \\"cleanup.policy\\", \\"value\\": \\"${cleanPolicy}\\" },
-                                    { \\"name\\": \\"retention.ms\\", \\"value\\": ${params.RetentionTime} },
-                                    { \\"name\\": \\"retention.bytes\\", \\"value\\": ${params.RetentionSize} },
-                                    { \\"name\\": \\"max.message.bytes\\", \\"value\\": ${params.MaxMessageBytes} }
-                                ]
-                            }"
-                            
-                            echo "Successful created topic name \"${params.TopicName}\"."
-                        else
-                            echo "Already has topic name \"${params.TopicName}\"."
-                        fi
-                    """)
+                    def createResult = sh(
+                        script: """
+                            if ! curl -H "Authorization: Basic \$API_KEY" --request GET --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" | grep -c "${params.TopicName}" ; then
+                                curl -H "Authorization: Basic \$API_KEY" -H 'Content-Type: application/json' --request POST --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" \
+                                -d "{
+                                    \\"topic_name\\":\\"${params.TopicName}\\",
+                                    \\"partitions_count\\":\\"${params.Partitions}\\",
+                                    \\"configs\\": [
+                                        { \\"name\\": \\"cleanup.policy\\", \\"value\\": \\"${cleanPolicy}\\" },
+                                        { \\"name\\": \\"retention.ms\\", \\"value\\": ${params.RetentionTime} },
+                                        { \\"name\\": \\"retention.bytes\\", \\"value\\": ${params.RetentionSize} },
+                                        { \\"name\\": \\"max.message.bytes\\", \\"value\\": ${params.MaxMessageBytes} }
+                                    ]
+                                }"
+                                
+                                echo "Successful created topic name \"${params.TopicName}\"."
+                            else
+                                echo "Already has topic name \"${params.TopicName}\"."
+                            fi
+                        """,
+                        returnStdout: true
+                    ).trim()
+
+                    writeFile file: 'create_result.txt', text: createResult
+                    archiveArtifacts artifacts: 'create_result.txt'
                 }
             }
         }
