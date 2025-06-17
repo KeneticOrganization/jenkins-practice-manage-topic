@@ -67,7 +67,6 @@ properties([
                                 <td><label>Cleanup Policy</label>
                                 <select name='value'>
                                     <option value='compact'>Compact</option>
-                                    <option value='compact,delete'>Compact & Delete</option>
                                     <option value='delete' selected>Delete</option>
                                 </select></td>
                                 <td><label>Retention Time (ms)</label><input name='value' type='number' value='604800000'></td>
