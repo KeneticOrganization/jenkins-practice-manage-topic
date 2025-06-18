@@ -24,7 +24,7 @@ pipeline {
                     echo "Creating output: ${output}"
                     
                     // Generate JUnit XML for create topic test
-                    generateJUnitXML('create-topic-test', output.contains('success') || output.contains('created'), 'Create Topic Test', output)
+                    generateJUnitXML('create-topic-test', output.contains('Success') || output.contains('created'), 'Create Topic Test', output)
                 }
             }
         }
@@ -80,7 +80,7 @@ pipeline {
                     echo "Update output: ${output}"
                     
                     // Generate JUnit XML for update topic test
-                    generateJUnitXML('update-topic-test', output.contains('success') || output.contains('updated'), 'Update Topic Test', output)
+                    generateJUnitXML('update-topic-test', output.contains('Success') || output.contains('updated'), 'Update Topic Test', output)
                 }
             }
         }
@@ -98,7 +98,7 @@ pipeline {
                     echo "Delete output: ${output}"
                     
                     // Generate JUnit XML for delete topic test
-                    generateJUnitXML('delete-topic-test', output.contains('success') || output.contains('deleted'), 'Delete Topic Test', output)
+                    generateJUnitXML('delete-topic-test', output.contains('Success') || output.contains('deleted'), 'Delete Topic Test', output)
                 }
             }
         }
