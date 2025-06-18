@@ -53,9 +53,9 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                                         --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics/\$topic/configs/\$property" \\
                                         -d "{\\\"value\\\": \\\"\$valueJson\\\"}"
                                 done
-                                echo "SUCCESSFULLY UPDATED TOPIC '${params.TopicName}'"
+                                echo "Successfully update topic '${params.TopicName}'"
                             else
-                                echo "UNKNOWN TOPIC '${params.TopicName}'"
+                                echo "Topic '${params.TopicName}' not found. Cannot update."
                             fi
                         """,
                         returnStdout: true
