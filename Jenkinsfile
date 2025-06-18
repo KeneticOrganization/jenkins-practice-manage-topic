@@ -22,6 +22,9 @@ pipeline {
 
                     def output = readFile('create_result.txt').trim()
                     echo "Creating output: ${output}"
+                    
+                    // Generate JUnit XML for create topic test
+                    generateJUnitXML('create-topic-test', output.contains('success') || output.contains('created'), 'Create Topic Test', output)
                 }
             }
         }
@@ -35,6 +38,9 @@ pipeline {
 
                     def output = readFile('list_result.txt').trim()
                     echo "List output: ${output}"
+                    
+                    // Generate JUnit XML for list topic test
+                    generateJUnitXML('list-topic-test', output.contains('test-topic'), 'List Topic Test', output)
                 }
             }
         }
@@ -50,6 +56,9 @@ pipeline {
 
                     def output = readFile('describe_result.txt').trim()
                     echo "Describe output: ${output}"
+                    
+                    // Generate JUnit XML for describe topic test
+                    generateJUnitXML('describe-topic-test', output.contains('test-topic'), 'Describe Topic Test', output)
                 }
             }
         }
@@ -69,6 +78,9 @@ pipeline {
 
                     def output = readFile('update_result.txt').trim()
                     echo "Update output: ${output}"
+                    
+                    // Generate JUnit XML for update topic test
+                    generateJUnitXML('update-topic-test', output.contains('success') || output.contains('updated'), 'Update Topic Test', output)
                 }
             }
         }
@@ -84,8 +96,56 @@ pipeline {
 
                     def output = readFile('delete_result.txt').trim()
                     echo "Delete output: ${output}"
+                    
+                    // Generate JUnit XML for delete topic test
+                    generateJUnitXML('delete-topic-test', output.contains('success') || output.contains('deleted'), 'Delete Topic Test', output)
                 }
             }
         }
     }
+    
+    post {
+        always {
+            // Publish JUnit test results
+            publishTestResults testResultsPattern: 'test-results/*.xml', 
+                              keepLongStdio: true,
+                              allowEmptyResults: false
+            
+            // Archive the test result files
+            archiveArtifacts artifacts: 'test-results/*.xml', allowEmptyArchive: true
+            
+            // Archive the original result files
+            archiveArtifacts artifacts: '*_result.txt', allowEmptyArchive: true
+        }
+        
+        success {
+            echo 'All topic management tests passed successfully!'
+        }
+        
+        failure {
+            echo 'Some topic management tests failed. Check the test results for details.'
+        }
+    }
+}
+
+// Helper function to generate JUnit XML format
+def generateJUnitXML(testName, passed, displayName, output) {
+    def status = passed ? 'passed' : 'failed'
+    def failureElement = passed ? '' : """
+        <failure message="Test failed" type="AssertionError">
+            <![CDATA[${output}]]>
+        </failure>"""
+    
+    def xmlContent = """<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="TopicManagementTests" tests="1" failures="${passed ? 0 : 1}" errors="0" time="1.0">
+    <testcase name="${testName}" classname="TopicManagement" time="1.0">
+        <system-out><![CDATA[${output}]]></system-out>${failureElement}
+    </testcase>
+</testsuite>"""
+    
+    // Create test-results directory if it doesn't exist
+    sh 'mkdir -p test-results'
+    
+    // Write the XML file
+    writeFile file: "test-results/${testName}.xml", text: xmlContent
 }
