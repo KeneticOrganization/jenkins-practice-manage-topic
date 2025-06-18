@@ -107,9 +107,9 @@ pipeline {
     post {
         always {
             // Publish JUnit test results
-            publishTestResults testResultsPattern: 'test-results/*.xml', 
-                              keepLongStdio: true,
-                              allowEmptyResults: false
+            junit testResults: 'test-results/*.xml', 
+                  keepLongStdio: true,
+                  allowEmptyResults: false
             
             // Archive the test result files
             archiveArtifacts artifacts: 'test-results/*.xml', allowEmptyArchive: true
