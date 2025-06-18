@@ -24,9 +24,4 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            junit skipPublishingChecks: true, testResults: 'test-results.xml'
-        }
-    }
 }
