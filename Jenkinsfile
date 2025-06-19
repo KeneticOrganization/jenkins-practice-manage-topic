@@ -93,8 +93,6 @@ pipeline {
         stage('List Topic'){
             steps{
                 script{
-                    echo "${REST_ENDPOINT}"
-                    echo "${CLUSTER_ID}"
                     def listResult = sh(
                         script: '''
                             RESPONSE=$(curl -s -H "Authorization: Basic $API_KEY" --request GET --url "$REST_ENDPOINT/kafka/v3/clusters/$CLUSTER_ID/topics")
