@@ -79,8 +79,8 @@ pipeline {
                     echo 'lkc-yjvgnk' //CLUSTER_ID
                     
                     def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
-                    echo "${env_params}[0]"
-                    echo "${env_params}[1]"
+                    echo "${env_params[0]}"
+                    echo "${env_params[1]}"
                 }
             }
         }
