@@ -86,8 +86,8 @@ pipeline {
                         env.CLUSTER_ID = env_params[1]
                     } else  {
                         def props = readProperties file: 'env.properties'
-                        echo props.REST_ENDPOINT
-                        echo props.CLUSTER_ID
+                        env.REST_ENDPOINT = props.REST_ENDPOINT
+                        env.CLUSTER_ID = props.CLUSTER_ID
                     }
                 }
             }
@@ -96,6 +96,10 @@ pipeline {
             steps{
                 script{
                     def listResult = sh(
+                        echo REST_ENDPOINT
+                        echo CLUSTER_ID
+                        echo env.REST_ENDPOINT
+                        echo env.CLUSTER_ID
                         script: '''
                             RESPONSE=$(curl -s -H "Authorization: Basic $API_KEY" --request GET --url "$REST_ENDPOINT/kafka/v3/clusters/$CLUSTER_ID/topics")
                             echo "$RESPONSE" | jq '.data'
