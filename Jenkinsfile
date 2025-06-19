@@ -166,6 +166,8 @@ Max Message Bytes (bytes) : ${values[5]}
 
                             def output = readFile('create_result.txt').trim()
                             echo "Creating output: ${output}"
+
+                            generateJUnitXML('create-topic', output.contains('Success') || output.contains('created'), 'Create Topic', output)
                         }
                     }
                 }
@@ -205,6 +207,8 @@ Max Message Bytes (bytes) : ${values[4]}
 
                             def output = readFile('update_result.txt').trim()
                             echo "Update output: ${output}"
+
+                            generateJUnitXML('update-topic', output.contains('Success') || output.contains('updated'), 'Update Topic', output)
                         }
                     }
                 }
@@ -227,6 +231,8 @@ Topic Name : ${values[0]}
 
                             def output = readFile('describe_result.txt').trim()
                             echo "Describe output: ${output}"
+
+                            generateJUnitXML('describe-topic', output.contains("${values[0]}"), 'Describe Topic', output)
                         }
                     }
                 }
@@ -242,6 +248,8 @@ Topic Name : ${values[0]}
 
                             def output = readFile('list_result.txt').trim()
                             echo "List output: ${output}"
+
+                            generateJUnitXML('list-topic', output.contains('KafkaTopic'), 'List Topic', output)
                         }
                     }
                 }
@@ -266,6 +274,8 @@ Topic Name : ${values[0]}
 
                                 def output = readFile('delete_result.txt').trim()
                                 echo "Delete output: ${output}"
+
+                                generateJUnitXML('delete-topic', output.contains('Success') || output.contains('deleted'), 'Delete Topic', output)
                             }
                         }
                     }
@@ -273,4 +283,45 @@ Topic Name : ${values[0]}
             }
         }
     }
+
+    post {
+        always {
+            junit testResults: 'test-results/*.xml', 
+                  keepLongStdio: true,
+                  allowEmptyResults: false
+            
+            archiveArtifacts artifacts: 'test-results/*.xml', allowEmptyArchive: true
+            
+            archiveArtifacts artifacts: '*_result.txt', allowEmptyArchive: true
+        }
+        
+        success {
+            echo 'All topic management tests passed successfully!'
+        }
+        
+        failure {
+            echo 'Some topic management tests failed. Check the test results for details.'
+        }
+    }
+}
+
+def generateJUnitXML(testName, passed, displayName, output) {
+    def status = passed ? 'passed' : 'failed'
+    def failureElement = passed ? '' : """
+        <failure message="Test failed" type="AssertionError">
+            <![CDATA[${output}]]>
+        </failure>"""
+    
+    def xmlContent = """<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="TopicManagementTests" tests="1" failures="${passed ? 0 : 1}" errors="0" time="1.0">
+    <testcase name="${testName}" classname="TopicManagement" time="1.0">
+        <system-out><![CDATA[${output}]]></system-out>${failureElement}
+    </testcase>
+</testsuite>"""
+    
+    // Create test-results directory if it doesn't exist
+    sh 'mkdir -p test-results'
+    
+    // Write the XML file
+    writeFile file: "test-results/${testName}.xml", text: xmlContent
 }
