@@ -96,8 +96,6 @@ pipeline {
             steps{
                 script{
                     def listResult = sh(
-                        echo REST_ENDPOINT
-                        echo CLUSTER_ID
                         echo env.REST_ENDPOINT
                         echo env.CLUSTER_ID
                         script: '''
