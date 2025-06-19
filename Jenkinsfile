@@ -3,8 +3,7 @@ properties([
         [$class: 'DynamicReferenceParameter', 
             choiceType: 'ET_FORMATTED_HTML', 
             description: '', 
-            filterLength: 1, 
-            filterable: false, 
+            omitValueField: false, 
             name: 'ParamsAsENV',
             script: [
                 $class: 'GroovyScript', 
@@ -27,8 +26,7 @@ properties([
         [$class: 'DynamicReferenceParameter', 
             choiceType: 'ET_FORMATTED_HTML', 
             description: '', 
-            filterLength: 1, 
-            filterable: false, 
+            omitValueField: false, 
             name: 'ENVIRONMENT_PARAMS',
             script: [
                 $class: 'GroovyScript', 
