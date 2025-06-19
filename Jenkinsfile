@@ -5,6 +5,7 @@ properties([
             description: '', 
             omitValueField: false, 
             name: 'ParamsAsENV',
+            referencedParameters: '',
             script: [
                 $class: 'GroovyScript', 
                 fallbackScript: [
@@ -18,7 +19,7 @@ properties([
                     sandbox: true, 
                     script: 
                         '''
-                        return "<input name="value" alt="Use parameterize to be environment." json="Use parameterize to be environment." type="checkbox" class=" ">"
+                        return "<input name=\"value\" alt=\"Use parameterize to be environment.\" json=\"Use parameterize to be environment.\" type=\"checkbox\" class=\" \">"
                         '''
                 ]
             ]
@@ -28,6 +29,7 @@ properties([
             description: '', 
             omitValueField: false, 
             name: 'ENVIRONMENT_PARAMS',
+            referencedParameters: 'ParamsAsENV',
             script: [
                 $class: 'GroovyScript', 
                 fallbackScript: [
