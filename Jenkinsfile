@@ -80,9 +80,9 @@ pipeline {
                     echo ParamsAsENV
                     
                     if (ParamsAsENV == 'true'){
-                        echo true
+                        echo 'true'
                     } else  {
-                        echo false
+                        echo 'false'
                     }
                     def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                     env.REST_ENDPOINT = env_params[0]
