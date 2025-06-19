@@ -77,10 +77,11 @@ pipeline {
                 script{
                     echo 'https://pkc-ldvr1.asia-southeast1.gcp.confluent.cloud:443' //REST_ENDPOINT
                     echo 'lkc-yjvgnk' //CLUSTER_ID
+                    echo ParamsAsENV
                     
                     def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
-                    echo "${env_params[0]}"
-                    echo "${env_params[1]}"
+                    env.REST_ENDPOINT = env_params[0]
+                    env.CLUSTER_ID = env_params[1]
                 }
             }
         }
