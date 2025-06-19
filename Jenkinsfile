@@ -96,8 +96,10 @@ pipeline {
             steps{
                 script{
                     def listResult = sh(
-                        echo env.REST_ENDPOINT
-                        echo env.CLUSTER_ID
+                        echo "${REST_ENDPOINT}"
+                        echo "${CLUSTER_ID}"
+                        echo "${env.REST_ENDPOINT}"
+                        echo "${env.CLUSTER_ID}"
                         script: '''
                             RESPONSE=$(curl -s -H "Authorization: Basic $API_KEY" --request GET --url "$REST_ENDPOINT/kafka/v3/clusters/$CLUSTER_ID/topics")
                             echo "$RESPONSE" | jq '.data'
