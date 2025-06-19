@@ -79,6 +79,11 @@ pipeline {
                     echo 'lkc-yjvgnk' //CLUSTER_ID
                     echo ParamsAsENV
                     
+                    if (ParamsAsENV == 'true'){
+                        echo true
+                    } else  {
+                        echo false
+                    }
                     def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                     env.REST_ENDPOINT = env_params[0]
                     env.CLUSTER_ID = env_params[1]
