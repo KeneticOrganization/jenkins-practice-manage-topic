@@ -208,7 +208,7 @@ Max Message Bytes (bytes) : ${values[4]}
                             def output = readFile('update_result.txt').trim()
                             echo "Update output: ${output}"
 
-                            generateJUnitXML('list-topic', output.contains("${values[0]}"), 'List Topic', output)
+                            generateJUnitXML('update-topic', output.contains('Success') || output.contains('updated'), 'Update Topic', output)
                         }
                     }
                 }
@@ -249,7 +249,7 @@ Topic Name : ${values[0]}
                             def output = readFile('list_result.txt').trim()
                             echo "List output: ${output}"
 
-                            generateJUnitXML('update-topic', output.contains('Success') || output.contains('updated'), 'Update Topic', output)
+                            generateJUnitXML('list-topic', output.contains("${values[0]}"), 'List Topic', output)
                         }
                     }
                 }
