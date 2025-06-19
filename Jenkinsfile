@@ -78,7 +78,7 @@ pipeline {
                     echo 'https://pkc-ldvr1.asia-southeast1.gcp.confluent.cloud:443' //REST_ENDPOINT
                     echo 'lkc-yjvgnk' //CLUSTER_ID
                     def UseParamsAsENV = "${ParamsAsENV}".split(',').collect { it.trim() }.findAll { it }
-                    echo UseParamsAsENV
+                    echo UseParamsAsENV[0]
                     
                     if (UseParamsAsENV[0] == 'true'){
                         echo 'true'
