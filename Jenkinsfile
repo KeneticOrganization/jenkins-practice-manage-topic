@@ -51,9 +51,9 @@ properties([
                                 <td><label>Partitions</label><input name='value' type='number' value='6'></td>
                                 <td><label>Cleanup Policy</label>
                                 <select name='value'>
-                                    <option value='compact'>Compact</option>
-                                    <option value='compact,delete'>Compact & Delete</option>
-                                    <option value='delete' selected>Delete</option>
+                                    <option value='Compact'>Compact</option>
+                                    <option value='Compact & Delete'>Compact & Delete</option>
+                                    <option value='Delete' selected>Delete</option>
                                 </select></td>
                                 <td><label>Retention Time (ms)</label><input name='value' type='number' value='604800000'></td>
                                 <td><label>Retention Size (bytes)</label><input name='value' type='number' value='-1'></td>
@@ -66,9 +66,8 @@ properties([
                                 <td><label>Topic Name</label><input name='value' type='text' value='default-topic'></td>
                                 <td><label>Cleanup Policy</label>
                                 <select name='value'>
-                                    <option value='compact'>Compact</option>
-                                    <option value='compact,delete'>Compact & Delete</option>
-                                    <option value='delete' selected>Delete</option>
+                                    <option value='Compact'>Compact</option>
+                                    <option value='Delete' selected>Delete</option>
                                 </select></td>
                                 <td><label>Retention Time (ms)</label><input name='value' type='number' value='604800000'></td>
                                 <td><label>Retention Size (bytes)</label><input name='value' type='number' value='-1'></td>
@@ -154,25 +153,19 @@ Retention Time (ms) : ${values[3]}
 Retention Size (bytes) : ${values[4]}
 Max Message Bytes (bytes) : ${values[5]}
                             """
-                            sh("""
-                                if ! curl -H "Authorization: Basic \$API_KEY" --request GET --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" | grep -c "${values[0]}" ; then
-                                    curl -H "Authorization: Basic \$API_KEY" -H 'Content-Type: application/json' --request POST --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" \
-                                    -d "{
-                                        \\"topic_name\\":\\"${values[0]}\\",
-                                        \\"partitions_count\\":\\"${values[1]}\\",
-                                        \\"configs\\": [
-                                            { \\"name\\": \\"cleanup.policy\\", \\"value\\": \\"${values[2]}\\" },
-                                            { \\"name\\": \\"retention.ms\\", \\"value\\": ${values[3]} },
-                                            { \\"name\\": \\"retention.bytes\\", \\"value\\": ${values[4]} },
-                                            { \\"name\\": \\"max.message.bytes\\", \\"value\\": ${values[5]} }
-                                        ]
-                                    }"
-                                    
-                                    echo "Successful created topic name \"${values[0]}\"."
-                                else
-                                    echo "Already has topic name \"${values[0]}\"."
-                                fi
-                            """)
+                            def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-topic-Jenkins', parameters: [
+                                string(name: 'TopicName', value: "${values[0]}"), 
+                                string(name: 'Partitions', value: "${values[1]}"), 
+                                string(name: 'CleanupPolicy', value: "${values[2]}"), 
+                                string(name: 'RetentionTime', value: "${values[3]}"), 
+                                string(name: 'RetentionSize', value: "${values[4]}"), 
+                                string(name: 'MaxMessageBytes', value: "${values[5]}")
+                            ]
+
+                            copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'create_result.txt')
+
+                            def output = readFile('create_result.txt').trim()
+                            echo "Creating output: ${output}"
                         }
                     }
                 }
@@ -200,25 +193,18 @@ Retention Time (ms) : ${values[2]}
 Retention Size (bytes) : ${values[3]}
 Max Message Bytes (bytes) : ${values[4]}
                             """
-                            def updateJson = """{
-                                \\"${values[0]}\\": {
-                                \\"retention.ms\\": ${values[2]},
-                                \\"retention.bytes\\": ${values[3]},
-                                \\"max.message.bytes\\": ${values[4]},
-                                \\"cleanup.policy\\": \\"${values[1]}\\"
-                                }
-                            }"""
+                            def updateResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/update-topic', parameters: [
+                                string(name: 'TopicName', value: "${values[0]}"), 
+                                string(name: 'CleanupPolicy', value: "${values[1]}"), 
+                                string(name: 'RetentionTime', value: "${values[2]}"), 
+                                string(name: 'RetentionSize', value: "${values[3]}"), 
+                                string(name: 'MaxMessageBytes', value: "${values[4]}")
+                            ]
 
-                            sh("""
-                                echo "${updateJson}" | jq -r 'to_entries[] | "\\(.key) \\(.value | to_entries[] )"' | while read topic data; do
-                                    property=\$(echo \$data | jq -r '.key')
-                                    valueJson=\$(echo \$data | jq -r '.value')
-                                    
-                                    curl -H "Authorization: Basic \$API_KEY" -H 'Content-Type: application/json' --request PUT \\
-                                        --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics/\$topic/configs/\$property" \\
-                                        -d "{\\\"value\\\": \\\"\$valueJson\\\"}"
-                                done
-                            """)
+                            copyArtifacts(projectName: updateResult.projectName, selector: specific("${updateResult.number}"), filter: 'update_result.txt')
+
+                            def output = readFile('update_result.txt').trim()
+                            echo "Update output: ${output}"
                         }
                     }
                 }
@@ -233,14 +219,14 @@ Max Message Bytes (bytes) : ${values[4]}
                             echo """
 Topic Name : ${values[0]}
                             """
-                            sh ("""
-                                if curl -H "Authorization: Basic \${API_KEY}" --request GET --url "\${REST_ENDPOINT}/kafka/v3/clusters/\${CLUSTER_ID}/topics" | grep -c "${values[0]}" ; then
-                                    RESPONSE=\$(curl -H "Authorization: Basic \${API_KEY}" --request GET --url "\${REST_ENDPOINT}/kafka/v3/clusters/\${CLUSTER_ID}/topics/${values[0]}")
-                                    echo "\$RESPONSE" | jq '.data'
-                                else
-                                    echo "Unknown topic \"\$TOPIC_NAME\"."
-                                fi
-                            """)
+                            def describeResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/describe-topic', parameters: [
+                                string(name: 'TopicName', value: "${values[0]}")
+                            ]
+
+                            copyArtifacts(projectName: describeResult.projectName, selector: specific("${describeResult.number}"), filter: 'describe_result.txt')
+
+                            def output = readFile('describe_result.txt').trim()
+                            echo "Describe output: ${output}"
                         }
                     }
                 }
@@ -250,15 +236,12 @@ Topic Name : ${values[0]}
                     }
                     steps{
                         script{
-                            def responseJson = sh(
-                                script: '''
-                                    RESPONSE=$(curl -s -H "Authorization: Basic $API_KEY" --request GET --url "$REST_ENDPOINT/kafka/v3/clusters/$CLUSTER_ID/topics")
-                                    echo "$RESPONSE" | jq '.data'
-                                ''',
-                                returnStdout: true
-                            ).trim()
-                            
-                            echo "${responseJson}"
+                            def listResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/list-topic'
+
+                            copyArtifacts(projectName: listResult.projectName, selector: specific("${listResult.number}"), filter: 'list_result.txt')
+
+                            def output = readFile('list_result.txt').trim()
+                            echo "List output: ${output}"
                         }
                     }
                 }
@@ -275,15 +258,14 @@ Topic Name : ${values[0]}
 Topic Name : ${values[0]}
                             """
                             if (env.confirmation){
-                                sh ("""
-                                    if curl -H "Authorization: Basic \$API_KEY" --request GET --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" | grep -c "${values[0]}" ; then
-                                        curl -H "Authorization: Basic \$API_KEY" --request DELETE --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics/${values[0]}"
-                                        
-                                        echo "Successfully deleted topic \\"${values[0]}\\"."
-                                    else
-                                        echo "Topic \\"${values[0]}\\" not found. Cannot delete."
-                                    fi
-                                """)
+                                def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-topic', parameters: [
+                                    string(name: 'TopicName', value: "${values[0]}")
+                                ]
+
+                                copyArtifacts(projectName: deleteResult.projectName, selector: specific("${deleteResult.number}"), filter: 'delete_result.txt')
+
+                                def output = readFile('delete_result.txt').trim()
+                                echo "Delete output: ${output}"
                             }
                         }
                     }
