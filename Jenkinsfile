@@ -17,10 +17,9 @@ properties([
                 script: [
                     classpath: [], 
                     sandbox: true, 
-                    script: 
-                        '''
-                        return "<input name=\"value\" alt=\"Use parameterize to be environment.\" json=\"Use parameterize to be environment.\" type=\"checkbox\" class=\" \">"
-                        '''
+                    script: '''
+                            return "<input type='checkbox' name='value' value='true'/> Use parameterized environment."
+                            '''
                 ]
             ]
         ],
@@ -49,7 +48,7 @@ properties([
                             return """
                                 <table><tr>
                                 <td><label>Rest API Endpoint</label><input name='value' type='text' value=''></td>
-                                <td><label>Cluster ID</label><input name='value' type='number' value=''></td>
+                                <td><label>Cluster ID</label><input name='value' type='text' value=''></td>
                                 </tr></table>
                             """
                         }
