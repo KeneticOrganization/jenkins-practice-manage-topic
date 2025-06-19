@@ -42,13 +42,13 @@ properties([
                     sandbox: true, 
                     script: 
                         '''
-                        if (ParamsAsENV == 'List'){
+                        if (ParamsAsENV == 'true'){
                             return "<label></label>"
                         } else{
                             return """
                                 <table><tr>
-                                <td><label>Rest API Endpoint</label><input name='value' type='text' value=''></td>
-                                <td><label>Cluster ID</label><input name='value' type='text' value=''></td>
+                                <td><label>Rest API Endpoint : </label><input name='value' type='text' value=''></td>
+                                <td><label>Cluster ID : </label><input name='value' type='text' value=''></td>
                                 </tr></table>
                             """
                         }
