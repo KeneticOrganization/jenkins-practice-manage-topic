@@ -52,7 +52,7 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                                     ]
                                 }"
                                 
-                                echo "Successful created topic name \"${params.TopicName}\"."
+                                echo "\nSuccessful created topic name \"${params.TopicName}\"."
                             else
                                 echo "Already has topic name \"${params.TopicName}\"."
                             fi
