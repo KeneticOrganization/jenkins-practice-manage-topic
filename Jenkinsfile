@@ -17,7 +17,7 @@ pipeline {
         stage('Creating Topic Testing'){
             steps{
                 script{
-                    def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-topic-Jenkins', parameters: [
+                    def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-topic-cp', parameters: [
                         string(name: 'TopicName', value: 'test-topic'), 
                         string(name: 'Partitions', value: '6'), 
                         string(name: 'CleanupPolicy', value: 'Compact'), 
@@ -42,7 +42,7 @@ pipeline {
         stage('List Topic Testing'){
             steps{
                 script{
-                    def listResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/list-topic', parameters: [
+                    def listResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/list-topic-cp', parameters: [
                         string(name: 'ParamsAsENV', value: 'true,'),
                         string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID},")
                     ]
@@ -61,7 +61,7 @@ pipeline {
         stage('Describe Topic Testing'){
             steps{
                 script{
-                    def describeResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/describe-topic', parameters: [
+                    def describeResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/describe-topic-cp', parameters: [
                         string(name: 'TopicName', value: 'test-topic'),
                         string(name: 'ParamsAsENV', value: 'true,'),
                         string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID},")
@@ -81,7 +81,7 @@ pipeline {
         stage('Update Topic Testing'){
             steps{
                 script{
-                    def updateResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/update-topic', parameters: [
+                    def updateResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/update-topic-cp', parameters: [
                         string(name: 'TopicName', value: 'test-topic'), 
                         string(name: 'CleanupPolicy', value: 'Delete'), 
                         string(name: 'RetentionTime', value: '259200000'), 
@@ -105,7 +105,7 @@ pipeline {
         stage('Delete Topic Testing'){
             steps{
                 script{
-                    def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-topic', parameters: [
+                    def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-topic-cp', parameters: [
                         string(name: 'TopicName', value: 'test-topic'),
                         string(name: 'ParamsAsENV', value: 'true,'),
                         string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID},")
