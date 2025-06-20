@@ -32,7 +32,10 @@ pipeline {
         stage('List Topic Testing'){
             steps{
                 script{
-                    def listResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/list-topic'
+                    def listResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/list-topic', parameters: [
+                        string(name: 'ParamsAsENV', value: 'true,'),
+                        string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID}")
+                    ]
 
                     copyArtifacts(projectName: listResult.projectName, selector: specific("${listResult.number}"), filter: 'list_result.txt')
 
