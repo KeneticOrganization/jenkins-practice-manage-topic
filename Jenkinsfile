@@ -92,11 +92,18 @@ properties([
 pipeline {
     agent any
     environment {
-        REST_ENDPOINT = 'https://pkc-ldvr1.asia-southeast1.gcp.confluent.cloud:443' // Replace with your actual REST endpoint
         API_KEY = credentials('BASE64_API_KEY')
-        CLUSTER_ID = 'lkc-yjvgnk' // replace with your cluster 
     }
     stages {
+        stage('Setup Environment') {
+            steps{
+                script{
+                    def props = readProperties file: 'env.properties'
+                    env.REST_ENDPOINT = props.REST_ENDPOINT
+                    env.CLUSTER_ID = props.CLUSTER_ID
+                }
+            }
+        }
         stage('Confirmation'){
             when{
                 expression {return params.Action == 'Delete'}
