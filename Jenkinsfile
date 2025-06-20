@@ -120,13 +120,13 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     def updateResult = sh(
                         script: """
                             # First check if topic exists
-                            if curl -H "Authorization: Basic \$API_KEY" --request GET --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
+                            if curl --request GET --url "\$REST_ENDPOINT/v3/clusters/\$CLUSTER_ID/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
                                 echo "${updateJson}" | jq -r 'to_entries[] | "\\(.key) \\(.value | to_entries[] )"' | while read topic data; do
                                     property=\$(echo \$data | jq -r '.key')
                                     valueJson=\$(echo \$data | jq -r '.value')
                                     
-                                    curl -H "Authorization: Basic \$API_KEY" -H 'Content-Type: application/json' --request PUT \\
-                                        --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics/\$topic/configs/\$property" \\
+                                    curl -H 'Content-Type: application/json' --request PUT \\
+                                        --url "\$REST_ENDPOINT/v3/clusters/\$CLUSTER_ID/topics/\$topic/configs/\$property" \\
                                         -d "{\\\"value\\\": \\\"\$valueJson\\\"}"
                                 done
                                 echo "Successfully update topic '${params.TopicName}'"
