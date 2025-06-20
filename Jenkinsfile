@@ -17,7 +17,7 @@ Topic Name : ${params.TopicName}
                     """
                     def deleteResult = sh (
                         script: """
-                            if curl -H "Authorization: Basic \$API_KEY" --request GET --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" | grep -c "${params.TopicName}" ; then
+                            if curl -H "Authorization: Basic \$API_KEY" --request GET --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
                                 curl -H "Authorization: Basic \$API_KEY" --request DELETE --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics/${params.TopicName}"
                                 
                                 echo "Successfully deleted topic \\"${params.TopicName}\\"."
