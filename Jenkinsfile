@@ -23,7 +23,9 @@ pipeline {
                         string(name: 'CleanupPolicy', value: 'Compact'), 
                         string(name: 'RetentionTime', value: '604800000'), 
                         string(name: 'RetentionSize', value: '-1'), 
-                        string(name: 'MaxMessageBytes', value: '2097164')
+                        string(name: 'MaxMessageBytes', value: '2097164'),
+                        string(name: 'ParamsAsENV', value: 'true,'),
+                        string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID},")
                     ]
 
                     copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'create_result.txt')
@@ -60,7 +62,9 @@ pipeline {
             steps{
                 script{
                     def describeResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/describe-topic', parameters: [
-                        string(name: 'TopicName', value: 'test-topic')
+                        string(name: 'TopicName', value: 'test-topic'),
+                        string(name: 'ParamsAsENV', value: 'true,'),
+                        string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID},")
                     ]
 
                     copyArtifacts(projectName: describeResult.projectName, selector: specific("${describeResult.number}"), filter: 'describe_result.txt')
@@ -82,7 +86,9 @@ pipeline {
                         string(name: 'CleanupPolicy', value: 'Delete'), 
                         string(name: 'RetentionTime', value: '259200000'), 
                         string(name: 'RetentionSize', value: '-1'), 
-                        string(name: 'MaxMessageBytes', value: '2097164')
+                        string(name: 'MaxMessageBytes', value: '2097164'),
+                        string(name: 'ParamsAsENV', value: 'true,'),
+                        string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID},")
                     ]
 
                     copyArtifacts(projectName: updateResult.projectName, selector: specific("${updateResult.number}"), filter: 'update_result.txt')
@@ -100,7 +106,9 @@ pipeline {
             steps{
                 script{
                     def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-topic', parameters: [
-                        string(name: 'TopicName', value: 'test-topic')
+                        string(name: 'TopicName', value: 'test-topic'),
+                        string(name: 'ParamsAsENV', value: 'true,'),
+                        string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID},")
                     ]
 
                     copyArtifacts(projectName: deleteResult.projectName, selector: specific("${deleteResult.number}"), filter: 'delete_result.txt')
