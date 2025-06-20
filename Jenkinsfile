@@ -1,11 +1,19 @@
 pipeline {
     agent any
     environment {
-        REST_ENDPOINT = 'https://pkc-ldvr1.asia-southeast1.gcp.confluent.cloud:443'
         API_KEY = credentials('BASE64_API_KEY')
-        CLUSTER_ID = 'lkc-yjvgnk'
     }
     stages {
+        stage('Setup Environment') {
+            steps{
+                script{
+                    def props = readProperties file: 'env.properties'
+                    env.REST_ENDPOINT = props.REST_ENDPOINT
+                    env.CLUSTER_ID = props.CLUSTER_ID
+                }
+            }
+        }
+        
         stage('Creating Topic Testing'){
             steps{
                 script{
