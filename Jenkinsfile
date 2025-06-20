@@ -61,9 +61,7 @@ properties([
 pipeline {
     agent any
     environment {
-        REST_ENDPOINT = 'https://pkc-ldvr1.asia-southeast1.gcp.confluent.cloud:443'
         API_KEY = credentials('BASE64_API_KEY')
-        CLUSTER_ID = 'lkc-yjvgnk'
     }
     parameters {
         string(name: 'TopicName', defaultValue: 'default-topic', description: 'String')
