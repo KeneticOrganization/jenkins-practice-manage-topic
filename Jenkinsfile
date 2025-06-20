@@ -88,7 +88,7 @@ pipeline {
                     def listResult = sh(
                         script: '''
                             RESPONSE=$(curl -s --request GET --url \"$REST_ENDPOINT/v3/clusters/$CLUSTER_ID/topics\")
-                            echo "$RESPONSE" | jq '.data'
+                            echo "$RESPONSE" | jq '.data | map(select(.topic_name | test("^__consumer_offsets|^_confluent|^__confluent|^_schemas|^__schemas|^connect-|^__connect|^_kafka_|^__kafka|^ksql|^_ksql|^__ksql|^__transaction_state|^__license|^_acl_|^__acl|^_internal|^__internal") | not))'
                         ''',
                         returnStdout: true
                     ).trim()
