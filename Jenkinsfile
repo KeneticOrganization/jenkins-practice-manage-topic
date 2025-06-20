@@ -87,7 +87,7 @@ pipeline {
                 script{
                     def listResult = sh(
                         script: '''
-                            RESPONSE=$(curl -s --request GET --url \"$REST_ENDPOINT/kafka/v3/clusters/$CLUSTER_ID/topics\")
+                            RESPONSE=$(curl -s --request GET --url \"$REST_ENDPOINT/v3/clusters/$CLUSTER_ID/topics\")
                             echo "$RESPONSE" | jq '.data'
                         ''',
                         returnStdout: true
