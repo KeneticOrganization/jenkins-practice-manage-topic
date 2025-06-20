@@ -115,8 +115,8 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
                     def createResult = sh(
                         script: """
-                            if ! curl -H "Authorization: Basic \$API_KEY" --request GET --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
-                                curl -H "Authorization: Basic \$API_KEY" -H 'Content-Type: application/json' --request POST --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" \
+                            if ! curl -s --request GET --url "\$REST_ENDPOINT/v3/clusters/\$CLUSTER_ID/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
+                                curl -s -H 'Content-Type: application/json' --request POST --url "\$REST_ENDPOINT/v3/clusters/\$CLUSTER_ID/topics" \
                                 -d "{
                                     \\"topic_name\\":\\"${params.TopicName}\\",
                                     \\"partitions_count\\":\\"${params.Partitions}\\",
