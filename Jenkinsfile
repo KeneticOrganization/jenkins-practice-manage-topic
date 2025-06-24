@@ -129,8 +129,8 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
                     def createResult = sh(
                         script: """
-                            if ! curl ${Auth} --request GET --url "${REST_ENDPOINT}/kafka/v3/clusters/${CLUSTER_ID}/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
-                                curl ${Auth} -H 'Content-Type: application/json' --request POST --url "${REST_ENDPOINT}/kafka/v3/clusters/${CLUSTER_ID}/topics" \
+                            if ! curl -s ${Auth} --request GET --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
+                                curl -s ${Auth} -H 'Content-Type: application/json' --request POST --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics" \
                                 -d "{
                                     \\"topic_name\\":\\"${params.TopicName}\\",
                                     \\"partitions_count\\":\\"${params.Partitions}\\",
@@ -142,7 +142,7 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                                     ]
                                 }"
                                 
-                                echo "\nSuccessful created topic name \"${params.TopicName}\"."
+                                echo "Successful created topic name \"${params.TopicName}\"."
                             else
                                 echo "Already has topic name \"${params.TopicName}\"."
                             fi
