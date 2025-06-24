@@ -87,10 +87,10 @@ pipeline {
                         def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                         env.REST_ENDPOINT = env_params[0]
                         env.CLUSTER_ID = env_params[1]
-                        env.Auth = ''
+                        env.Auth = ""
                         if(env_params[2] == 'Cloud'){
                             env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
-                            env.Auth = env.Auth + ' -H "Authorization: Basic $API_KEY"'
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \\$API_KEY\""
                         }
                     } else  {
                         def props = readProperties file: 'env.properties'
