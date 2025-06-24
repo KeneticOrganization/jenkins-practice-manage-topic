@@ -47,6 +47,11 @@ properties([
                                 <table><tr>
                                 <td><label>Rest API Endpoint : </label><input name='value' type='text' value=''></td>
                                 <td><label>Cluster ID : </label><input name='value' type='text' value=''></td>
+                                <td><label>Connection Type : </label>
+                                <select name='value'>
+                                    <option value='Cloud'>Confluent Cloud</option>
+                                    <option value='Platform'>Confluent Platform</option>
+                                </select></td>
                                 </tr></table>
                             """
                         } else{
@@ -83,10 +88,22 @@ pipeline {
                         def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                         env.REST_ENDPOINT = env_params[0]
                         env.CLUSTER_ID = env_params[1]
+                        env.Auth = ""
+                        if(env_params[2] == 'Cloud'){
+                            env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \$API_KEY\""
+                            echo env.Auth
+                        }
                     } else  {
                         def props = readProperties file: 'env.properties'
                         env.REST_ENDPOINT = props.REST_ENDPOINT
                         env.CLUSTER_ID = props.CLUSTER_ID
+                        env.Auth = ""
+                        if(props.CONNECTION_TYPE == 'CLOUD'){
+                            env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \$API_KEY\""
+                            echo env.Auth
+                        }
                     }
                 }
             }
@@ -120,13 +137,13 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     def updateResult = sh(
                         script: """
                             # First check if topic exists
-                            if curl -H "Authorization: Basic \$API_KEY" --request GET --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
+                            if curl -s ${Auth} --request GET --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
                                 echo "${updateJson}" | jq -r 'to_entries[] | "\\(.key) \\(.value | to_entries[] )"' | while read topic data; do
                                     property=\$(echo \$data | jq -r '.key')
                                     valueJson=\$(echo \$data | jq -r '.value')
                                     
-                                    curl -H "Authorization: Basic \$API_KEY" -H 'Content-Type: application/json' --request PUT \\
-                                        --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics/\$topic/configs/\$property" \\
+                                    curl -s ${Auth} -H 'Content-Type: application/json' --request PUT \\
+                                        --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics/\$topic/configs/\$property" \\
                                         -d "{\\\"value\\\": \\\"\$valueJson\\\"}"
                                 done
                                 echo "Successfully update topic '${params.TopicName}'"
