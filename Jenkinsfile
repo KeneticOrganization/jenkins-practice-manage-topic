@@ -107,7 +107,7 @@ pipeline {
                 script{
                     def describeResult = sh(
                             script:"""
-                            if curl ${env.Auth} --request GET --url "${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
+                            if curl -s ${env.Auth} --request GET --url "${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
                                 RESPONSE=\$(curl ${env.Auth} --request GET --url "${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics/${params.TopicName}")
                                 echo "\$RESPONSE" | jq '.'
                             else
