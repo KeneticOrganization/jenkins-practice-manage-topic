@@ -47,6 +47,11 @@ properties([
                                 <table><tr>
                                 <td><label>Rest API Endpoint : </label><input name='value' type='text' value=''></td>
                                 <td><label>Cluster ID : </label><input name='value' type='text' value=''></td>
+                                <td><label>Connection Type : </label>
+                                <select name='value'>
+                                    <option value='Cloud'>Confluent Cloud</option>
+                                    <option value='Platform'>Confluent Platform</option>
+                                </select></td>
                                 </tr></table>
                             """
                         } else{
