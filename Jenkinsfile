@@ -87,21 +87,27 @@ pipeline {
                         env.REST_ENDPOINT = env_params[0]
                         env.CLUSTER_ID = env_params[1]
                         env.Auth = ""
+                        env.Sort = "jq '.data"
                         if(env_params[2] == 'Cloud'){
                             env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
                             env.Auth = env.Auth + " -H \"Authorization: Basic \$API_KEY\""
+                            env.Sort = env.Sort + " | map(select(.topic_name | startswith(\"_\") | not))"
                             echo env.Auth
                         }
+                        env.Sort = env.Sort + "'"
                     } else  {
                         def props = readProperties file: 'env.properties'
                         env.REST_ENDPOINT = props.REST_ENDPOINT
                         env.CLUSTER_ID = props.CLUSTER_ID
                         env.Auth = ""
+                        env.Sort = "jq '.data"
                         if(props.CONNECTION_TYPE == 'CLOUD'){
                             env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
                             env.Auth = env.Auth + " -H \"Authorization: Basic \$API_KEY\""
+                            env.Sort = env.Sort + " | map(select(.topic_name | startswith(\"_\") | not))"
                             echo env.Auth
                         }
+                        env.Sort = env.Sort + "'"
                     }
                 }
             }
@@ -111,8 +117,8 @@ pipeline {
                 script{
                     def listResult = sh(
                         script: """
-                            RESPONSE=\$(curl -s ${Auth} --request GET --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics")
-                            echo "\$RESPONSE" | jq '.data'
+                            RESPONSE=\$(curl -s ${env.Auth} --request GET --url "${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics")
+                            echo "\$RESPONSE" | ${env.Sort}
                         """,
                         returnStdout: true
                     ).trim()
