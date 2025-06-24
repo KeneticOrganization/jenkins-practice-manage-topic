@@ -111,7 +111,7 @@ pipeline {
                 script{
                     def listResult = sh(
                         script: """
-                            RESPONSE=$(curl -s ${Auth} --request GET --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics")
+                            RESPONSE=\$(curl -s ${Auth} --request GET --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics")
                             echo "$RESPONSE" | jq '.data'
                         """,
                         returnStdout: true
