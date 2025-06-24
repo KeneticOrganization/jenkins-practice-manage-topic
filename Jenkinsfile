@@ -90,7 +90,8 @@ pipeline {
                         env.Auth = ""
                         if(env_params[2] == 'Cloud'){
                             env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
-                            env.Auth = env.Auth + " -H \"Authorization: Basic \\$API_KEY\""
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \$API_KEY\""
+                            echo env.Auth
                         }
                     } else  {
                         def props = readProperties file: 'env.properties'
@@ -99,7 +100,8 @@ pipeline {
                         env.Auth = ""
                         if(props.CONNECTION_TYPE == 'CLOUD'){
                             env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
-                            env.Auth = env.Auth + " -H \"Authorization: Basic \\$API_KEY\""
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \$API_KEY\""
+                            echo env.Auth
                         }
                     }
                 }
