@@ -47,6 +47,11 @@ properties([
                                 <table><tr>
                                 <td><label>Rest API Endpoint : </label><input name='value' type='text' value=''></td>
                                 <td><label>Cluster ID : </label><input name='value' type='text' value=''></td>
+                                <td><label>Connection Type : </label>
+                                <select name='value'>
+                                    <option value='Cloud'>Confluent Cloud</option>
+                                    <option value='Platform'>Confluent Platform</option>
+                                </select></td>
                                 </tr></table>
                             """
                         } else{
@@ -78,16 +83,25 @@ pipeline {
             steps{
                 script{
                     def UseParamsAsENV = "${ParamsAsENV}".split(',').collect { it.trim() }.findAll { it }
-                    echo UseParamsAsENV[0]
                     
                     if (UseParamsAsENV[0] == 'true'){
                         def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                         env.REST_ENDPOINT = env_params[0]
                         env.CLUSTER_ID = env_params[1]
+                        env.Auth = ""
+                        if(env_params[2] == 'Cloud'){
+                            env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \$API_KEY\""
+                        }
                     } else  {
                         def props = readProperties file: 'env.properties'
                         env.REST_ENDPOINT = props.REST_ENDPOINT
                         env.CLUSTER_ID = props.CLUSTER_ID
+                        env.Auth = ""
+                        if(props.CONNECTION_TYPE == 'CLOUD'){
+                            env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \$API_KEY\""
+                        }
                     }
                 }
             }
@@ -115,8 +129,8 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
                     def createResult = sh(
                         script: """
-                            if ! curl -H "Authorization: Basic \$API_KEY" --request GET --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
-                                curl -H "Authorization: Basic \$API_KEY" -H 'Content-Type: application/json' --request POST --url "\$REST_ENDPOINT/kafka/v3/clusters/\$CLUSTER_ID/topics" \
+                            if ! curl -s ${Auth} --request GET --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
+                                curl -s ${Auth} -H 'Content-Type: application/json' --request POST --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics" \
                                 -d "{
                                     \\"topic_name\\":\\"${params.TopicName}\\",
                                     \\"partitions_count\\":\\"${params.Partitions}\\",
@@ -128,7 +142,7 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                                     ]
                                 }"
                                 
-                                echo "\nSuccessful created topic name \"${params.TopicName}\"."
+                                echo "Successful created topic name \"${params.TopicName}\"."
                             else
                                 echo "Already has topic name \"${params.TopicName}\"."
                             fi
