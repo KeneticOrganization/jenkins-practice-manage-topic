@@ -81,7 +81,6 @@ pipeline {
                     // echo 'https://pkc-ldvr1.asia-southeast1.gcp.confluent.cloud:443' //REST_ENDPOINT
                     // echo 'lkc-yjvgnk' //CLUSTER_ID
                     def UseParamsAsENV = "${ParamsAsENV}".split(',').collect { it.trim() }.findAll { it }
-                    echo UseParamsAsENV[0]
                     
                     if (UseParamsAsENV[0] == 'true'){
                         def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
@@ -111,10 +110,10 @@ pipeline {
             steps{
                 script{
                     def listResult = sh(
-                        script: '''
-                            RESPONSE=$(curl -s $Auth --request GET --url "$REST_ENDPOINT/v3/clusters/$CLUSTER_ID/topics")
+                        script: """
+                            RESPONSE=$(curl -s ${Auth} --request GET --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics")
                             echo "$RESPONSE" | jq '.data'
-                        ''',
+                        """,
                         returnStdout: true
                     ).trim()
                     
