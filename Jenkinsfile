@@ -77,10 +77,22 @@ pipeline {
                         def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                         env.REST_ENDPOINT = env_params[0]
                         env.CLUSTER_ID = env_params[1]
+                        env.Auth = ""
+                        if(env_params[2] == 'Cloud'){
+                            env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \$API_KEY\""
+                            echo env.Auth
+                        }
                     } else  {
                         def props = readProperties file: 'env.properties'
                         env.REST_ENDPOINT = props.REST_ENDPOINT
                         env.CLUSTER_ID = props.CLUSTER_ID
+                        env.Auth = ""
+                        if(props.CONNECTION_TYPE == 'CLOUD'){
+                            env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \$API_KEY\""
+                            echo env.Auth
+                        }
                     }
                 }
             }
@@ -90,8 +102,8 @@ pipeline {
                 script{
                     def describeResult = sh(
                             script:"""
-                            if curl -H "Authorization: Basic \${API_KEY}" --request GET --url "\${REST_ENDPOINT}/kafka/v3/clusters/\${CLUSTER_ID}/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
-                                RESPONSE=\$(curl -H "Authorization: Basic \${API_KEY}" --request GET --url "\${REST_ENDPOINT}/kafka/v3/clusters/\${CLUSTER_ID}/topics/${params.TopicName}")
+                            if curl \${env.Auth} --request GET --url "${env.REST_ENDPOINT}/v3/clusters/\${env.CLUSTER_ID}/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
+                                RESPONSE=\$(curl ${env.Auth} --request GET --url "${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics/${params.TopicName}")
                                 echo "\$RESPONSE" | jq '.'
                             else
                                 echo "Unknown topic \"${params.TopicName}\"."
