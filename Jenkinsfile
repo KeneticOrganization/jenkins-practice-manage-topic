@@ -12,7 +12,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return['LIST_TOPIC:ERROR']'''
+                        '''return['UPDATE_TOPIC:ERROR']'''
                 ], 
                 script: [
                     classpath: [], 
@@ -35,7 +35,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return['LIST_TOPIC:ERROR']'''
+                        '''return['UPDATE_TOPIC:ERROR']'''
                 ], 
                 script: [
                     classpath: [], 
