@@ -47,6 +47,8 @@ properties([
                                 <table><tr>
                                 <td><label>Rest API Endpoint : </label><input name='value' type='text' value=''></td>
                                 <td><label>Cluster ID : </label><input name='value' type='text' value=''></td>
+                                <td><label>Bootstrap Server : </label><input name='value' type='text' value=''></td>
+                                <td><label>Kafka Tools Path : </label><input name='value' type='text' value=''></td>
                                 </tr></table>
                             """
                         } else{
@@ -84,10 +86,14 @@ pipeline {
                         def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                         env.REST_ENDPOINT = env_params[0]
                         env.CLUSTER_ID = env_params[1]
+                        env.BOOTSTRAP_SERVER = env_params[2]
+                        env.KAFKA_TOOLS_PATH = env_params[3]
                     } else  {
                         def props = readProperties file: 'env.properties'
                         env.REST_ENDPOINT = props.REST_ENDPOINT
                         env.CLUSTER_ID = props.CLUSTER_ID
+                        env.BOOTSTRAP_SERVER = props.BOOTSTRAP_SERVER
+                        env.KAFKA_TOOLS_PATH = props.KAFKA_TOOLS_PATH
                     }
                 }
             }
