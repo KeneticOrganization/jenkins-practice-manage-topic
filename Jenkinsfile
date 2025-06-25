@@ -90,8 +90,7 @@ pipeline {
                 script{
                     def listResult = sh(
                         script: """
-                            RESPONSE=\$(${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list)
-                            echo "\$RESPONSE" | jq '. | map(select(.topic_name | startswith("_") | not))'
+                            ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list | grep -v '^_'
                         """,
                         returnStdout: true
                     ).trim()
