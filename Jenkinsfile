@@ -115,18 +115,18 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
                     def createResult = sh(
                         script: """
-                            if ! curl -s --request GET --url "\$REST_ENDPOINT/v3/clusters/\$CLUSTER_ID/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
-                                curl -s -H 'Content-Type: application/json' --request POST --url "\$REST_ENDPOINT/v3/clusters/\$CLUSTER_ID/topics" \
-                                -d "{
-                                    \\"topic_name\\":\\"${params.TopicName}\\",
-                                    \\"partitions_count\\":\\"${params.Partitions}\\",
-                                    \\"configs\\": [
-                                        { \\"name\\": \\"cleanup.policy\\", \\"value\\": \\"${cleanPolicy}\\" },
-                                        { \\"name\\": \\"retention.ms\\", \\"value\\": ${params.RetentionTime} },
-                                        { \\"name\\": \\"retention.bytes\\", \\"value\\": ${params.RetentionSize} },
-                                        { \\"name\\": \\"max.message.bytes\\", \\"value\\": ${params.MaxMessageBytes} }
-                                    ]
-                                }"
+                            if ! ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list | grep -xq ${params.TopicName}" ; then
+                                ${KAFKA_HOME}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP} \
+                                    --create \
+                                    --topic ${params.TopicName} \
+                                    --partitions ${params.Partitions} \
+                                    --replication-factor 1
+
+                                ${KAFKA_HOME}/bin/kafka-configs.sh --bootstrap-server ${BOOTSTRAP} \
+                                    --entity-type topics \
+                                    --entity-name ${params.TopicName} \
+                                    --alter \
+                                    --add-config cleanup.policy=${params.CleanupPolicy},retention.ms=${params.RetentionTime},retention.bytes=${params.RetentionSize},max.message.bytes=${params.MaxMessageBytes}
                                 
                                 echo "\nSuccessful created topic name \"${params.TopicName}\"."
                             else
