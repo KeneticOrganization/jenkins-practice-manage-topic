@@ -122,13 +122,13 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     def createResult = sh(
                         script: """
                             if ! ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list | grep -xq ${params.TopicName}" ; then
-                                ${KAFKA_HOME}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP} \
+                                ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} \
                                     --create \
                                     --topic ${params.TopicName} \
                                     --partitions ${params.Partitions} \
                                     --replication-factor 1
 
-                                ${KAFKA_HOME}/bin/kafka-configs.sh --bootstrap-server ${BOOTSTRAP} \
+                                ${KAFKA_TOOLS_PATH}/bin/kafka-configs.sh --bootstrap-server ${BOOTSTRAP_SERVER} \
                                     --entity-type topics \
                                     --entity-name ${params.TopicName} \
                                     --alter \
