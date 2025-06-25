@@ -126,7 +126,7 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                                     --create \
                                     --topic ${params.TopicName} \
                                     --partitions ${params.Partitions} \
-                                    --replication-factor 1
+                                    --replication-factor 1 \
                                     --config cleanup.policy=\\"${cleanPolicy}\\" \
                                     --config retention.ms=${params.RetentionTime} \
                                     --config retention.bytes=${params.RetentionSize} \
