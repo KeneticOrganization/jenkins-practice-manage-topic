@@ -47,6 +47,7 @@ properties([
                                 <table><tr>
                                 <td><label>Rest API Endpoint : </label><input name='value' type='text' value=''></td>
                                 <td><label>Cluster ID : </label><input name='value' type='text' value=''></td>
+                                <td><label>Kafka Tools Path : </label><input name='value' type='text' value=''></td>
                                 </tr></table>
                             """
                         } else{
@@ -74,10 +75,12 @@ pipeline {
                         def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                         env.REST_ENDPOINT = env_params[0]
                         env.CLUSTER_ID = env_params[1]
+                        env.KAFKA_TOOLS_PATH = env_params[2]
                     } else  {
                         def props = readProperties file: 'env.properties'
                         env.REST_ENDPOINT = props.REST_ENDPOINT
                         env.CLUSTER_ID = props.CLUSTER_ID
+                        env.KAFKA_TOOLS_PATH = props.KAFKA_TOOLS_PATH
                     }
                 }
             }
@@ -86,10 +89,10 @@ pipeline {
             steps{
                 script{
                     def listResult = sh(
-                        script: '''
-                            RESPONSE=$(curl -s --request GET --url \"$REST_ENDPOINT/v3/clusters/$CLUSTER_ID/topics\")
-                            echo "$RESPONSE" | jq '.data | map(select(.topic_name | startswith("_") | not))'
-                        ''',
+                        script: """
+                            RESPONSE=\$(${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list)
+                            echo "\$RESPONSE" | jq '. | map(select(.topic_name | startswith("_") | not))'
+                        """,
                         returnStdout: true
                     ).trim()
                     
