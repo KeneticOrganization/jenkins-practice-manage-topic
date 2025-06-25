@@ -109,7 +109,7 @@ pipeline {
                         cleanPolicy = "delete"
                     }
                     else if (params.CleanupPolicy == "Compact & Delete") {
-                        cleanPolicy = "compact\\\\,delete"
+                        cleanPolicy = "compact,delete"
                     }
                     echo """
 Topic Name : ${params.TopicName}
