@@ -132,7 +132,7 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                                     --entity-type topics \
                                     --entity-name ${params.TopicName} \
                                     --alter \
-                                    --add-config cleanup.policy=\'${cleanPolicy}\',retention.ms=${params.RetentionTime},retention.bytes=${params.RetentionSize},max.message.bytes=${params.MaxMessageBytes}
+                                    --add-config cleanup.policy=\"${cleanPolicy}\",retention.ms=${params.RetentionTime},retention.bytes=${params.RetentionSize},max.message.bytes=${params.MaxMessageBytes}
                                 
                                 echo "\nSuccessful created topic name \"${params.TopicName}\"."
                             else
