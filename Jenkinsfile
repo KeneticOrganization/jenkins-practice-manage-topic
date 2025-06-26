@@ -18,7 +18,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: '''
-                            return "<input type='checkbox' name='value' value='true'/> Use parameterized environment."
+                            return "<input type='hidden' name='value' value='true'/> Use parameterized environment."
                             '''
                 ]
             ]
