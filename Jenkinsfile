@@ -3,7 +3,7 @@ properties([
         [$class: 'DynamicReferenceParameter', 
             choiceType: 'ET_FORMATTED_HIDDEN_HTML', 
             description: '', 
-            omitValueField: true, 
+            omitValueField: false, 
             name: 'ParamsAsENV',
             referencedParameters: '',
             script: [
@@ -18,7 +18,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: '''
-                            return "<input type='checkbox' name='value' value='true'/>"
+                            return "<input type='text' name='value' value=''/>"
                             '''
                 ]
             ]
