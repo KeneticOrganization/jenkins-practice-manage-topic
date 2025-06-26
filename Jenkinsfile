@@ -1,7 +1,7 @@
 properties([
     parameters([
         [$class: 'DynamicReferenceParameter', 
-            choiceType: 'ET_FORMATTED_HTML', 
+            choiceType: 'ET_FORMATTED_HIDDEN_HTML', 
             description: '', 
             omitValueField: false, 
             name: 'ParamsAsENV',
@@ -24,7 +24,7 @@ properties([
             ]
         ],
         [$class: 'DynamicReferenceParameter', 
-            choiceType: 'ET_FORMATTED_HTML', 
+            choiceType: 'ET_FORMATTED_HIDDEN_HTML', 
             description: '', 
             omitValueField: false, 
             name: 'ENVIRONMENT_PARAMS',
