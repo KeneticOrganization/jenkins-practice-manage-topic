@@ -3,7 +3,7 @@ properties([
         [$class: 'DynamicReferenceParameter', 
             choiceType: 'ET_FORMATTED_HIDDEN_HTML', 
             description: '', 
-            omitValueField: false, 
+            omitValueField: true, 
             name: 'ParamsAsENV',
             referencedParameters: '',
             script: [
