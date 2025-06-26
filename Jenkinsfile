@@ -18,7 +18,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: '''
-                            return "<table><tr><td><input type='checkbox' name='value' value='true'></td></tr></table>"
+                            return "<label></label>"
                             '''
                 ]
             ]
