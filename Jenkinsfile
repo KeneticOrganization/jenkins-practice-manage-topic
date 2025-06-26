@@ -5,7 +5,7 @@ properties([
             description: '', 
             omitValueField: true, 
             name: 'ParamsAsENV',
-            referencedParameters: '',
+            referencedParameters: 'ParamsAsENV',
             script: [
                 $class: 'GroovyScript', 
                 fallbackScript: [
@@ -18,7 +18,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: '''
-                            return "<label></label>"
+                            return "<input type='checkbox' name='value' value='true'>"
                             '''
                 ]
             ]
