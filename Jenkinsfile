@@ -105,12 +105,12 @@ pipeline {
                         env.CLUSTER_ID = props.CLUSTER_ID
                         env.Auth = ""
                         env.Sort = "jq '.data"
-                        if(props.CONNECTION_TYPE == 'CLOUD'){
+                        if(props.CONNECTION_TYPE == 'Cloud'){
                             env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
                             env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_API_KEY\""
                             echo env.Auth
                         }
-                        else if (props.CONNECTION_TYPE == 'PLATFORM') {
+                        else if (props.CONNECTION_TYPE == 'Platform') {
                             env.Sort = env.Sort + " | map(select(.topic_name | startswith(\"_\") | not))"
                             env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                         }
