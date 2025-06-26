@@ -24,9 +24,9 @@ properties([
             ]
         ],
         [$class: 'DynamicReferenceParameter', 
-            choiceType: 'ET_FORMATTED_HTML', 
+            choiceType: 'ET_FORMATTED_HIDDEN_HTML', 
             description: '', 
-            omitValueField: false, 
+            omitValueField: true, 
             name: 'ENVIRONMENT_PARAMS',
             referencedParameters: 'ParamsAsENV',
             script: [
