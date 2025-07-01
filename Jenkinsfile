@@ -95,7 +95,7 @@ pipeline {
                     def describeResult = sh(
                             script:"""
                             if ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -v '^${params.TopicName}\$' ; then
-                                RESPONSE=\$(${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --describe --topic my-topic --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties)
+                                RESPONSE=\$(${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --describe --topic ${params.TopicName} --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties)
                                 echo "\$RESPONSE" | jq '.'
                             else
                                 echo "Unknown topic \"${params.TopicName}\"."
