@@ -108,28 +108,18 @@ Retention Time (ms) : ${params.RetentionTime}
 Retention Size (bytes) : ${params.RetentionSize}
 Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
-                    def updateJson = """{
-                        \\"${params.TopicName}\\": {
-                        \\"retention.ms\\": ${params.RetentionTime},
-                        \\"retention.bytes\\": ${params.RetentionSize},
-                        \\"max.message.bytes\\": ${params.MaxMessageBytes},
-                        \\"cleanup.policy\\": \\"${cleanPolicy}\\"
-                        }
-                    }"""
-
+                    
                     def updateResult = sh(
                         script: """
                             # First check if topic exists
-                            if curl --request GET --url "\$REST_ENDPOINT/v3/clusters/\$CLUSTER_ID/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
-                                echo "${updateJson}" | jq -r 'to_entries[] | "\\(.key) \\(.value | to_entries[] )"' | while read topic data; do
-                                    property=\$(echo \$data | jq -r '.key')
-                                    valueJson=\$(echo \$data | jq -r '.value')
-                                    
-                                    curl -H 'Content-Type: application/json' --request PUT \\
-                                        --url "\$REST_ENDPOINT/v3/clusters/\$CLUSTER_ID/topics/\$topic/configs/\$property" \\
-                                        -d "{\\\"value\\\": \\\"\$valueJson\\\"}"
-                                done
-                                echo "Successfully update topic '${params.TopicName}'"
+                            if ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq "${params.TopicName}" ; then
+                                # Update topic configurations
+                                ${KAFKA_TOOLS_PATH}/bin/kafka-configs.sh --bootstrap-server ${BOOTSTRAP_SERVER} --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties \
+                                    --entity-type topics \
+                                    --entity-name ${params.TopicName} \
+                                    --alter \
+                                    --add-config cleanup.policy=${cleanPolicy},retention.ms=${params.RetentionTime},retention.bytes=${params.RetentionSize},max.message.bytes=${params.MaxMessageBytes}
+                                echo "Successfully updated topic '${params.TopicName}'"
                             else
                                 echo "Topic '${params.TopicName}' not found. Cannot update."
                             fi
