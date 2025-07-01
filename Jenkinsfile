@@ -12,7 +12,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return['LIST_TOPIC:ERROR']'''
+                        '''return['DELETE_TOPIC:ERROR']'''
                 ], 
                 script: [
                     classpath: [], 
@@ -35,7 +35,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return['LIST_TOPIC:ERROR']'''
+                        '''return['DELETE_TOPIC:ERROR']'''
                 ], 
                 script: [
                     classpath: [], 
@@ -77,10 +77,14 @@ pipeline {
                         def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                         env.REST_ENDPOINT = env_params[0]
                         env.CLUSTER_ID = env_params[1]
+                        env.BOOTSTRAP_SERVER = env_params[2]
+                        env.KAFKA_TOOLS_PATH = env_params[3]
                     } else  {
                         def props = readProperties file: 'env.properties'
                         env.REST_ENDPOINT = props.REST_ENDPOINT
                         env.CLUSTER_ID = props.CLUSTER_ID
+                        env.BOOTSTRAP_SERVER = props.BOOTSTRAP_SERVER
+                        env.KAFKA_TOOLS_PATH = props.KAFKA_TOOLS_PATH
                     }
                 }
             }
@@ -93,9 +97,9 @@ Topic Name : ${params.TopicName}
                     """
                     def deleteResult = sh (
                         script: """
-                            if curl --request GET --url "\$REST_ENDPOINT/v3/clusters/\$CLUSTER_ID/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
-                                curl --request DELETE --url "\$REST_ENDPOINT/v3/clusters/\$CLUSTER_ID/topics/${params.TopicName}"
-                                
+                            if ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq "${params.TopicName}" ; then
+                                ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --delete --topic ${params.TopicName} --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties
+
                                 echo "Successfully deleted topic \\"${params.TopicName}\\"."
                             else
                                 echo "Topic \\"${params.TopicName}\\" not found. Cannot delete."
