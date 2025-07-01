@@ -121,8 +121,8 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
                     def createResult = sh(
                         script: """
-                            if ! ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-sasl.properties | grep -xq "${params.TopicName}" ; then
-                                ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --command-config ${KAFKA_TOOLS_PATH}/config/kafka-sasl.properties \
+                            if ! ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq "${params.TopicName}" ; then
+                                ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties \
                                     --create \
                                     --topic ${params.TopicName} \
                                     --partitions ${params.Partitions} \
