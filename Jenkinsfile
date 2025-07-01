@@ -93,7 +93,7 @@ pipeline {
                 script{
                     def listResult = sh(
                         script: """
-                            ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list | grep -v '^_'
+                            ${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config /opt/kafka/config/kafka-config.properties | grep -v '^_'
                         """,
                         returnStdout: true
                     ).trim()
