@@ -66,7 +66,8 @@ properties([
 pipeline {
     agent any
     environment {
-        API_KEY = credentials('BASE64_API_KEY')
+        CC_API_KEY = credentials('BASE64_API_KEY')
+        CP_API_KEY = credentials('CP_BASE64_API_KEY')
     }
     parameters {
         string(name: 'TopicName', defaultValue: 'default-topic', description: 'String')
@@ -85,16 +86,22 @@ pipeline {
                         env.Auth = ""
                         if(env_params[2] == 'Cloud'){
                             env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
-                            env.Auth = env.Auth + " -H \"Authorization: Basic \$API_KEY\""
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_API_KEY\""
+                        }
+                        else if(env_params[2] == 'Platform'){
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                         }
                     } else  {
                         def props = readProperties file: 'env.properties'
                         env.REST_ENDPOINT = props.REST_ENDPOINT
                         env.CLUSTER_ID = props.CLUSTER_ID
                         env.Auth = ""
-                        if(props.CONNECTION_TYPE == 'CLOUD'){
+                        if(props.CONNECTION_TYPE == 'Cloud'){
                             env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
-                            env.Auth = env.Auth + " -H \"Authorization: Basic \$API_KEY\""
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_API_KEY\""
+                        }
+                        else if(props.CONNECTION_TYPE == 'Platform'){
+                            env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                         }
                     }
                 }
