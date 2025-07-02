@@ -84,38 +84,43 @@ pipeline {
             steps{
                 script{
                     def UseParamsAsENV = "${ParamsAsENV}".split(',').collect { it.trim() }.findAll { it }
+                    def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                     
+                    def props = null
+                    if (UseParamsAsENV[0] != 'true') {
+                        props = readProperties file: 'env.properties'
+                    }
+
                     if (UseParamsAsENV[0] == 'true'){
-                        def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
-                        env.REST_ENDPOINT = env_params[0]
-                        env.CLUSTER_ID = env_params[1]
-                        env.Auth = ""
-                        if(env_params[2] == 'Cloud'){
-                            env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
-                            env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_API_KEY\""
-                        } 
-                        else if(env_params[2] == 'Platform'){
-                            env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
+                        if (env_params[2] == 'Platform,KafkaTools') {
+                            env.BOOTSTRAP_SERVER = env_params[0]
+                            env.KAFKA_TOOLS_PATH = env_params[1]
+                        }
+                        else {
+                            env.REST_ENDPOINT = env_params[0]
+                            env.CLUSTER_ID = env_params[1]
                         }
                     } else  {
-                        def props = readProperties file: 'env.properties'
-                        env.REST_ENDPOINT = props.REST_ENDPOINT
-                        env.CLUSTER_ID = props.CLUSTER_ID
-                        env.Auth = ""
-                        if(props.CONNECTION_TYPE == 'Cloud'){
-                            env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
-                            env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_API_KEY\""
+                        if (props.CONNECTION_TYPE == 'Platform,KafkaTools') {
+                            env.BOOTSTRAP_SERVER = props.BOOTSTRAP_SERVER
+                            env.KAFKA_TOOLS_PATH = props.KAFKA_TOOLS_PATH
                         }
-                        else if(props.CONNECTION_TYPE == 'Platform'){
-                            env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
+                        else {
+                            env.REST_ENDPOINT = props.REST_ENDPOINT
+                            env.CLUSTER_ID = props.CLUSTER_ID
                         }
                     }
-                }
-            }
-        }
-        stage('Create Topic'){
-            steps{
-                script{
+                    env.Auth = ""
+                    env.Sort = "| jq '.'"
+                    if(env_params[2] == 'Cloud' || props.CONNECTION_TYPE == 'Cloud'){
+                        env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
+                        env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_API_KEY\""
+                    }
+                    else if (env_params[2] == 'Platform,RestAPI' || props.CONNECTION_TYPE == 'Platform,RestAPI'){
+                        env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
+                    }
+
+                    // Create Topic Part
                     def cleanPolicy = ""
                     if (params.CleanupPolicy == "Compact") {
                         cleanPolicy = "compact"
@@ -134,20 +139,44 @@ Retention Time (ms) : ${params.RetentionTime}
 Retention Size (bytes) : ${params.RetentionSize}
 Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
+                    env.HasTopic = "curl -s ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics\" | grep -c \"\\\"topic_name\\\":\\\"${params.TopicName}\\\"\""
+                    env.Command = """
+                    curl -s ${Auth} -H 'Content-Type: application/json' --request POST --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics" \
+                        -d "{
+                            \\"topic_name\\":\\"${params.TopicName}\\",
+                            \\"partitions_count\\":\\"${params.Partitions}\\",
+                            \\"configs\\": [
+                                { \\"name\\": \\"cleanup.policy\\", \\"value\\": \\"${cleanPolicy}\\" },
+                                { \\"name\\": \\"retention.ms\\", \\"value\\": ${params.RetentionTime} },
+                                { \\"name\\": \\"retention.bytes\\", \\"value\\": ${params.RetentionSize} },
+                                { \\"name\\": \\"max.message.bytes\\", \\"value\\": ${params.MaxMessageBytes} }
+                            ]
+                        }"
+                    """
+                    if (env_params[2] == 'Platform,KafkaTools' || props.CONNECTION_TYPE == 'Platform,KafkaTools'){
+                        env.Sort = ""
+                        env.HasTopic = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq \"${params.TopicName}\""
+                        env.Command = """${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties \
+                                    --create \
+                                    --topic ${params.TopicName} \
+                                    --partitions ${params.Partitions} \
+                                    --replication-factor 1 \
+                                    --config cleanup.policy=${cleanPolicy} \
+                                    --config retention.ms=${params.RetentionTime} \
+                                    --config retention.bytes=${params.RetentionSize} \
+                                    --config max.message.bytes=${params.MaxMessageBytes}
+                        """
+                    }
+                }
+            }
+        }
+        stage('Create Topic'){
+            steps{
+                script{
                     def createResult = sh(
                         script: """
-                            if ! curl -s ${Auth} --request GET --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics" | grep -c "\\"topic_name\\":\\"${params.TopicName}\\"" ; then
-                                curl -s ${Auth} -H 'Content-Type: application/json' --request POST --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics" \
-                                -d "{
-                                    \\"topic_name\\":\\"${params.TopicName}\\",
-                                    \\"partitions_count\\":\\"${params.Partitions}\\",
-                                    \\"configs\\": [
-                                        { \\"name\\": \\"cleanup.policy\\", \\"value\\": \\"${cleanPolicy}\\" },
-                                        { \\"name\\": \\"retention.ms\\", \\"value\\": ${params.RetentionTime} },
-                                        { \\"name\\": \\"retention.bytes\\", \\"value\\": ${params.RetentionSize} },
-                                        { \\"name\\": \\"max.message.bytes\\", \\"value\\": ${params.MaxMessageBytes} }
-                                    ]
-                                }"
+                            if ! ${env.HasTopic} ; then
+                                ${env.Command}
                                 
                                 echo "Successful created topic name \"${params.TopicName}\"."
                             else
