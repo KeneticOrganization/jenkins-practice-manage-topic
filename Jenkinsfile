@@ -89,6 +89,9 @@ pipeline {
                     if (UseParamsAsENV[0] != 'true') {
                         props = readProperties file: 'env.properties'
                     }
+                    else if (env.params[2] == 'Platform'){
+                        env.params[2] = params[2] + ',' + params[3]
+                    }
 
                     if (UseParamsAsENV[0] == 'true'){
                         if (env_params[2] == 'Platform,KafkaTools') {
