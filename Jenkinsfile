@@ -129,12 +129,20 @@ pipeline {
                     }
                     echo """
 Topic Name : ${params.TopicName}
-Partition : ${params.Partitions}
 Cleanup Policy : ${cleanPolicy}
 Retention Time (ms) : ${params.RetentionTime}
 Retention Size (bytes) : ${params.RetentionSize}
 Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
+                    def updateJson = """{
+                        \\"${params.TopicName}\\": {
+                        \\"retention.ms\\": ${params.RetentionTime},
+                        \\"retention.bytes\\": ${params.RetentionSize},
+                        \\"max.message.bytes\\": ${params.MaxMessageBytes},
+                        \\"cleanup.policy\\": \\"${cleanPolicy}\\"
+                        }
+                    }"""
+
                     env.HasTopic = "curl -s ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics\" | grep -c \"\\\"topic_name\\\":\\\"${params.TopicName}\\\"\""
                     env.Command = """
                     echo "${updateJson}" | jq -r 'to_entries[] | "\\(.key) \\(.value | to_entries[] )"' | while read topic data; do
@@ -163,28 +171,6 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
         stage('Update Topic'){
             steps{
                 script{
-                    def cleanPolicy = ""
-                    if (params.CleanupPolicy == "Compact") {
-                        cleanPolicy = "compact"
-                    } 
-                    else if (params.CleanupPolicy == "Delete"){
-                        cleanPolicy = "delete"
-                    }
-                    echo """
-Topic Name : ${params.TopicName}
-Cleanup Policy : ${cleanPolicy}
-Retention Time (ms) : ${params.RetentionTime}
-Retention Size (bytes) : ${params.RetentionSize}
-Max Message Bytes (bytes) : ${params.MaxMessageBytes}
-                    """
-                    def updateJson = """{
-                        \\"${params.TopicName}\\": {
-                        \\"retention.ms\\": ${params.RetentionTime},
-                        \\"retention.bytes\\": ${params.RetentionSize},
-                        \\"max.message.bytes\\": ${params.MaxMessageBytes},
-                        \\"cleanup.policy\\": \\"${cleanPolicy}\\"
-                        }
-                    }"""
 
                     def updateResult = sh(
                         script: """
