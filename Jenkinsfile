@@ -85,18 +85,14 @@ pipeline {
                 script{
                     def UseParamsAsENV = "${ParamsAsENV}".split(',').collect { it.trim() }.findAll { it }
                     def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
-
-                    for (int i=0;i<3;i++) {
-                        echo env_params[i]
-                    }
                     
                     def props = null
                     if (UseParamsAsENV[0] != 'true') {
                         props = readProperties file: 'env.properties'
                     }
-                    else if (env_params[2] == 'Platform'){
-                        env_params[2] = "${env_params[2]},${env_params[3]}"
-                        echo env_params[2]
+                    else if (env_params[2] != 'Cloud'){
+                        env_params[0] = env_params[0].replaceAll(";", ",")
+                        env_params[2] = env_params[2].replaceAll(";", ",")
                     }
 
                     if (UseParamsAsENV[0] == 'true'){
