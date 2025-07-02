@@ -91,7 +91,7 @@ pipeline {
                         props = readProperties file: 'env.properties'
                     }
                     else if (env_params[2] == 'Platform'){
-                        env_params[2] = env_params[2] + ',' + env_params[3]
+                        env_params[2] = "${env_params[2]},${env_params[3]}"
                     }
 
                     if (UseParamsAsENV[0] == 'true'){
