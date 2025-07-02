@@ -149,8 +149,8 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                                     property=\$(echo \$data | jq -r '.key')
                                     valueJson=\$(echo \$data | jq -r '.value')
                                     
-                                    curl -s ${Auth} -H 'Content-Type: application/json' --request PUT \\
-                                        --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics/\$topic/configs/\$property" \\
+                                    curl -s ${env.Auth} -H 'Content-Type: application/json' --request PUT \\
+                                        --url "${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics/\$topic/configs/\$property" \\
                                         -d "{\\\"value\\\": \\\"\$valueJson\\\"}"
                     done
                     """
