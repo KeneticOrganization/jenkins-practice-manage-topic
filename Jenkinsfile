@@ -141,7 +141,7 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
                     env.HasTopic = "curl -s ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics\" | grep -c \"\\\"topic_name\\\":\\\"${params.TopicName}\\\"\""
                     env.Command = """
-                    curl -s ${Auth} -H 'Content-Type: application/json' --request POST --url "${REST_ENDPOINT}/v3/clusters/${CLUSTER_ID}/topics" \
+                    curl -s ${env.Auth} -H 'Content-Type: application/json' --request POST --url "${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics" \
                         -d "{
                             \\"topic_name\\":\\"${params.TopicName}\\",
                             \\"partitions_count\\":\\"${params.Partitions}\\",
@@ -155,8 +155,8 @@ Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
                     if (env_params[2] == 'Platform,KafkaTools' || props.CONNECTION_TYPE == 'Platform,KafkaTools'){
                         env.Sort = ""
-                        env.HasTopic = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq \"${params.TopicName}\""
-                        env.Command = """${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties \
+                        env.HasTopic = "${env.KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${env.BOOTSTRAP_SERVER} --list --command-config ${env.KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq \"${params.TopicName}\""
+                        env.Command = """${env.KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${env.BOOTSTRAP_SERVER} --command-config ${env.KAFKA_TOOLS_PATH}/config/kafka-config.properties \
                                     --create \
                                     --topic ${params.TopicName} \
                                     --partitions ${params.Partitions} \
