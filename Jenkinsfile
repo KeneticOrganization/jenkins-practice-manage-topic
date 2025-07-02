@@ -114,7 +114,7 @@ pipeline {
                     env.Sort = env.Sort + "'"
                     env.Command = "curl -s ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics\""
                     if (env_params[2] == 'Platform,KafkaTools' || props.CONNECTION_TYPE == 'Platform,KafkaTools'){
-                        env.Sort = ""
+                        env.Sort = "| grep -v '^_'"
                         env.Command = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties"
                     }
                 }
