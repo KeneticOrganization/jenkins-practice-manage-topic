@@ -74,9 +74,9 @@ pipeline {
             steps{
                 script{
                     def UseParamsAsENV = "${ParamsAsENV}".split(',').collect { it.trim() }.findAll { it }
+                    def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                     
                     if (UseParamsAsENV[0] == 'true'){
-                        def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                         if (env_params[2] == 'Platform,KafkaTools') {
                             env.BOOTSTRAP_SERVER = env_params[0]
                             env.KAFKA_TOOLS_PATH = env_params[1]
