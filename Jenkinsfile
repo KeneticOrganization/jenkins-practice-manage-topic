@@ -76,6 +76,11 @@ pipeline {
                     def UseParamsAsENV = "${ParamsAsENV}".split(',').collect { it.trim() }.findAll { it }
                     def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
                     
+                    def props = null
+                    if (UseParamsAsENV[0] != 'true') {
+                        props = readProperties file: 'env.properties'
+                    }
+
                     if (UseParamsAsENV[0] == 'true'){
                         if (env_params[2] == 'Platform,KafkaTools') {
                             env.BOOTSTRAP_SERVER = env_params[0]
@@ -86,7 +91,6 @@ pipeline {
                             env.CLUSTER_ID = env_params[1]
                         }
                     } else  {
-                        def props = readProperties file: 'env.properties'
                         if (props.CONNECTION_TYPE == 'Platform,KafkaTools') {
                             env.BOOTSTRAP_SERVER = props.BOOTSTRAP_SERVER
                             env.KAFKA_TOOLS_PATH = props.KAFKA_TOOLS_PATH
