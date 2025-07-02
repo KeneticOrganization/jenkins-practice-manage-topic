@@ -105,18 +105,18 @@ pipeline {
                     }
                     env.Auth = ""
                     env.Sort = "| jq '.data"
-                    if(env_params[2] == 'Cloud' || props.CONNECTION_TYPE == 'Cloud'){
+                    if(env_params[2] == 'Cloud' || props?.CONNECTION_TYPE? == 'Cloud'){
                         env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_API_KEY\""
                         echo env.Auth
                     }
-                    else if (env_params[2] == 'Platform,RestAPI' || props.CONNECTION_TYPE == 'Platform,RestAPI'){
+                    else if (env_params[2] == 'Platform,RestAPI' || props?.CONNECTION_TYPE? == 'Platform,RestAPI'){
                         env.Sort = env.Sort + " | map(select(.topic_name | startswith(\"_\") | not))"
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                     }
                     env.Sort = env.Sort + "'"
                     env.Command = "curl -s ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics\""
-                    if (env_params[2] == 'Platform,KafkaTools' || props.CONNECTION_TYPE == 'Platform,KafkaTools'){
+                    if (env_params[2] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE? == 'Platform,KafkaTools'){
                         env.Sort = "| grep -v '^_'"
                         env.Command = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties"
                     }
