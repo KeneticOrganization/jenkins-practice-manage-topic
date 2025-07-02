@@ -85,6 +85,10 @@ pipeline {
                 script{
                     def UseParamsAsENV = "${ParamsAsENV}".split(',').collect { it.trim() }.findAll { it }
                     def env_params = "${ENVIRONMENT_PARAMS}".split(',').collect { it.trim() }.findAll { it }
+
+                    for (int i=0;i<3;i++) {
+                        echo env_params[i]
+                    }
                     
                     def props = null
                     if (UseParamsAsENV[0] != 'true') {
