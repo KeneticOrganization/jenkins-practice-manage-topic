@@ -108,7 +108,6 @@ pipeline {
                     if(env_params[2] == 'Cloud' || props.CONNECTION_TYPE == 'Cloud'){
                         env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_API_KEY\""
-                        echo env.Auth
                     }
                     else if (env_params[2] == 'Platform,RestAPI' || props.CONNECTION_TYPE == 'Platform,RestAPI'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
