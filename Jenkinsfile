@@ -80,8 +80,9 @@ pipeline {
                     if (UseParamsAsENV[0] != 'true') {
                         props = readProperties file: 'env.properties'
                     }
-                    else if (env_params[2] == 'Platform'){
-                        env_params[2] = env_params[2] + ',' + env_params[3]
+                    else if (env_params[2] != 'Cloud'){
+                        env_params[0] = env_params[0].replaceAll(";", ",")
+                        env_params[2] = env_params[2].replaceAll(";", ",")
                     }
 
                     if (UseParamsAsENV[0] == 'true'){
