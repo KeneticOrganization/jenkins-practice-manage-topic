@@ -27,7 +27,7 @@ properties([
             description: '', 
             name: 'Option', 
             omitValueField: false, 
-            referencedParameters: 'Action',
+            referencedParameters: 'TopicAction',
             script: [
                 $class: 'GroovyScript', 
                 fallbackScript: [
