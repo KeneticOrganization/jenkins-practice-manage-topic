@@ -135,6 +135,18 @@ properties([
                                 </tr></table>
                             """
                             return html
+                        } else if (TopicAction == 'Delete') {
+                            def html = ""
+                            def count = values[0].isInteger() ? values[0].toInteger() : 1
+                            for (int i = 0; i < count; i++) {
+                                html += """
+                                    <div style="margin-bottom: 10px;">
+                                        <label for="option_${i}">Topic Name ${i + 1}:</label>
+                                        <input type="text" id="option_${i}" name="value" value="topic-${i + 1}" style="width: 300px;" />
+                                    </div>
+                                """
+                            }
+                            return html
                         } else {
                             return """ 
                                 <label>This action didn't need any options.</label> 
