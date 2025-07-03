@@ -39,7 +39,7 @@ properties([
                 $class: 'GroovyScript', 
                 script: [
                     classpath: [], 
-                    sandbox: true, 
+                    sandbox: false, 
                     script: 
                         '''
                         if (TopicAction == 'List'){
@@ -201,7 +201,7 @@ properties([
     ])
 ])
 pipeline {
-    agent any
+    agent none
     environment {
         API_KEY = credentials('BASE64_API_KEY')
     }
@@ -226,7 +226,6 @@ pipeline {
             when{
                 expression {return params.Action == 'Delete'}
             }
-            agent none
             steps{
                 script {
                     def option = "${Option}"
