@@ -70,7 +70,7 @@ pipeline {
         CP_API_KEY = credentials('CP_BASE64_API_KEY')
     }
     parameters {
-        string(name: 'TopicName', defaultValue: 'default-topic', description: 'String')
+        string(name: 'TopicName', defaultValue: 'default-topic', description: 'Topic name(s) - use comma to separate multiple topics')
     }
     stages {
         stage('Setup Environment') {
@@ -116,37 +116,65 @@ pipeline {
                     else if (env_params[2] == 'Platform,RestAPI' || props?.CONNECTION_TYPE == 'Platform,RestAPI'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                     }
-                    env.HasTopic = "curl -s ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics\" | grep -c \"\\\"topic_name\\\":\\\"${params.TopicName}\\\"\""
-                    env.Command = "curl -s ${env.Auth} --request DELETE --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics/${params.TopicName}\""
-                    if (env_params[2] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE == 'Platform,KafkaTools'){
-                        env.Sort = ""
-                        env.HasTopic = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq \"${params.TopicName}\""
-                        env.Command = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --delete --topic ${params.TopicName} --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties"
-                    }
+                    
+                    echo """
+Topic Name(s) : ${params.TopicName}
+                    """
                 }
             }
         }
-        stage('Delete Topic'){
+        stage('Delete Topics'){
             steps{
                 script{
-                    echo """
-Topic Name : ${params.TopicName}
-                    """
-                    def deleteResult = sh (
-                        script: """
-                            if ${env.HasTopic} ; then
-                                ${env.Command}
-                                
-                                echo "Successfully deleted topic \\"${params.TopicName}\\"."
-                            else
-                                echo "Topic \\"${params.TopicName}\\" not found. Cannot delete."
-                            fi
-                        """,
-                        returnStdout: true
-                    ).trim()
+                    // Split topic names by comma and trim whitespace
+                    def topicNames = params.TopicName.split(',').collect { it.trim() }.findAll { it }
+                    def allResults = []
                     
-                    writeFile file: 'delete_result.txt', text: deleteResult
+                    echo "Found ${topicNames.size()} topic(s) to delete: ${topicNames.join(', ')}"
+                    
+                    // Loop through each topic name
+                    for (String topicName : topicNames) {
+                        echo "Processing topic: ${topicName}"
+                        
+                        // Set up commands for current topic
+                        def hasTopicCommand = ""
+                        def deleteCommand = ""
+                        
+                        if (env.BOOTSTRAP_SERVER && env.KAFKA_TOOLS_PATH) {
+                            // Platform KafkaTools approach
+                            hasTopicCommand = "${env.KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${env.BOOTSTRAP_SERVER} --list --command-config ${env.KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq \"${topicName}\""
+                            deleteCommand = "${env.KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${env.BOOTSTRAP_SERVER} --delete --topic ${topicName} --command-config ${env.KAFKA_TOOLS_PATH}/config/kafka-config.properties"
+                        } else {
+                            // REST API approach
+                            hasTopicCommand = "curl -s ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics\" | grep -c \"\\\"topic_name\\\":\\\"${topicName}\\\"\""
+                            deleteCommand = "curl -s ${env.Auth} --request DELETE --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics/${topicName}\""
+                        }
+                        
+                        // Execute topic deletion for current topic
+                        def deleteResult = sh(
+                            script: """
+                                if ${hasTopicCommand} ; then
+                                    echo "Deleting topic: ${topicName}"
+                                    ${deleteCommand}
+                                    
+                                    echo "Successfully deleted topic \\"${topicName}\\"."
+                                else
+                                    echo "Topic \\"${topicName}\\" not found. Cannot delete."
+                                fi
+                            """,
+                            returnStdout: true
+                        ).trim()
+                        
+                        allResults.add("=== Topic: ${topicName} ===\n${deleteResult}")
+                        echo "Completed processing topic: ${topicName}"
+                    }
+                    
+                    // Write all results to file
+                    def finalResult = allResults.join('\n\n')
+                    writeFile file: 'delete_result.txt', text: finalResult
                     archiveArtifacts artifacts: 'delete_result.txt'
+                    
+                    echo "All topics processing completed. Results archived in delete_result.txt"
                 }
             }
         }
