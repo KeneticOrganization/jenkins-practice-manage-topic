@@ -68,7 +68,7 @@ properties([
             description: '', 
             name: 'Option', 
             omitValueField: false, 
-            referencedParameters: 'Amount',
+            referencedParameters: 'TopicAction,Amount',
             script: [
                 $class: 'GroovyScript', 
                 fallbackScript: [
