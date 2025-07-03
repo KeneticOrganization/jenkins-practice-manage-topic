@@ -5,7 +5,7 @@ properties([
             description: 'What do you want to do?', 
             filterLength: 1, 
             filterable: false, 
-            name: 'TopicAction',
+            name: 'Action',
             script: [
                 $class: 'GroovyScript', 
                 fallbackScript: [
@@ -42,148 +42,40 @@ properties([
                     sandbox: true, 
                     script: 
                         '''
-                        if (TopicAction == 'List'){
-                            return "<label>This action didn't need any options.</label>"
-                        } else if (TopicAction == 'Create') {
+                        if (Action == 'List'){
+                            return "<label>This action didn't need any opions.</label>"
+                        } else if (Action == 'Create') {
                             return """
-                                <div style="width: 630px; margin-bottom: 15px;">
-                                    <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="max-width: 100%; height: auto;">
+                                <table><tr>
+                                <div style="width: 630px;">
+                                <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg">
                                 </div>
-                                
-                                <div style="margin-bottom: 15px;">
-                                    <label style="font-weight: bold; color: #333;">Number of Topics to Create:</label>
-                                    <input type="number" id="topicCount" min="1" value="1" onchange="generateTopicInputs()" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
-                                </div>
-                                
-                                <div id="topicInputsContainer"></div>
-                                
-                                <script>
-                                    function generateTopicInputs() {
-                                        const count = parseInt(document.getElementById('topicCount').value);
-                                        const container = document.getElementById('topicInputsContainer');
-                                        
-                                        let html = '';
-                                        for (let i = 1; i <= count; i++) {
-                                            html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa;">';
-                                            html += '<h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Topic ' + i + '</h4>';
-                                            html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><input name="value" type="text" value="default-topic-' + i + '" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Partitions</label><input name="value" type="number" value="6" style="width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Cleanup Policy</label><select name="value" style="width: 130px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"><option value="Compact">Compact</option><option value="Compact & Delete">Compact & Delete</option><option value="Delete" selected>Delete</option></select></td>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Time (ms)</label><input name="value" type="number" value="604800000" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Size (bytes)</label><input name="value" type="number" value="-1" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Max Message Bytes</label><input name="value" type="number" value="2097164" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                            html += '</tr></table></div>';
-                                        }
-                                        container.innerHTML = html;
-                                    }
-                                    
-                                    // Initialize with one topic
-                                    generateTopicInputs();
-                                </script>
+                                <td><label>Topic Name</label><input name='value' type='text' value='default-topic'></td>
+                                <td><label>Partitions</label><input name='value' type='number' value='6'></td>
+                                <td><label>Cleanup Policy</label>
+                                <select name='value'>
+                                    <option value='Compact'>Compact</option>
+                                    <option value='Compact & Delete'>Compact & Delete</option>
+                                    <option value='Delete' selected>Delete</option>
+                                </select></td>
+                                <td><label>Retention Time (ms)</label><input name='value' type='number' value='604800000'></td>
+                                <td><label>Retention Size (bytes)</label><input name='value' type='number' value='-1'></td>
+                                <td><label>Max Message Bytes (bytes)</label><input name='value' type='number' value='2097164'></td>
+                                </tr></table>
                             """
                         } else if (Action == 'Update') {
                             return """
-                                <div style="width: 630px; margin-bottom: 15px;">
-                                    <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="max-width: 100%; height: auto;">
-                                </div>
-                                
-                                <div style="margin-bottom: 15px;">
-                                    <label style="font-weight: bold; color: #333;">Number of Topics to Update:</label>
-                                    <input type="number" id="topicCountUpdate" min="1" value="1" onchange="generateUpdateInputs()" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
-                                </div>
-                                
-                                <div id="topicUpdateContainer"></div>
-                                
-                                <script>
-                                    function generateUpdateInputs() {
-                                        const count = parseInt(document.getElementById('topicCountUpdate').value);
-                                        const container = document.getElementById('topicUpdateContainer');
-                                        
-                                        let html = '';
-                                        for (let i = 1; i <= count; i++) {
-                                            html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa;">';
-                                            html += '<h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Topic ' + i + ' Update</h4>';
-                                            html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><input name="value" type="text" value="default-topic-' + i + '" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Cleanup Policy</label><select name="value" style="width: 130px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"><option value="Compact">Compact</option><option value="Delete" selected>Delete</option></select></td>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Time (ms)</label><input name="value" type="number" value="604800000" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Size (bytes)</label><input name="value" type="number" value="-1" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Max Message Bytes</label><input name="value" type="number" value="2097164" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                            html += '</tr></table></div>';
-                                        }
-                                        container.innerHTML = html;
-                                    }
-                                    
-                                    // Initialize with one topic
-                                    generateUpdateInputs();
-                                </script>
-                            """
-                        } else if (Action == 'Delete') {
-                            return """
-                                <div style="width: 630px; margin-bottom: 15px;">
-                                    <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="max-width: 100%; height: auto;">
-                                </div>
-                                
-                                <div style="margin-bottom: 15px;">
-                                    <label style="font-weight: bold; color: #333;">Number of Topics to Delete:</label>
-                                    <input type="number" id="topicCountDelete" min="1" value="1" onchange="generateDeleteInputs()" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
-                                </div>
-                                
-                                <div id="topicDeleteContainer"></div>
-                                
-                                <script>
-                                    function generateDeleteInputs() {
-                                        const count = parseInt(document.getElementById('topicCountDelete').value);
-                                        const container = document.getElementById('topicDeleteContainer');
-                                        
-                                        let html = '';
-                                        for (let i = 1; i <= count; i++) {
-                                            html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa;">';
-                                            html += '<h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Topic ' + i + ' to Delete</h4>';
-                                            html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><input name="value" type="text" value="default-topic-' + i + '" style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                            html += '</tr></table></div>';
-                                        }
-                                        container.innerHTML = html;
-                                    }
-                                    
-                                    // Initialize with one topic
-                                    generateDeleteInputs();
-                                </script>
-                            """
-                        } else if (Action == 'Describe') {
-                            return """
-                                <div style="width: 630px; margin-bottom: 15px;">
-                                    <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="max-width: 100%; height: auto;">
-                                </div>
-                                
-                                <div style="margin-bottom: 15px;">
-                                    <label style="font-weight: bold; color: #333;">Number of Topics to Describe:</label>
-                                    <input type="number" id="topicCountDescribe" min="1" value="1" onchange="generateDescribeInputs()" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
-                                </div>
-                                
-                                <div id="topicDescribeContainer"></div>
-                                
-                                <script>
-                                    function generateDescribeInputs() {
-                                        const count = parseInt(document.getElementById('topicCountDescribe').value);
-                                        const container = document.getElementById('topicDescribeContainer');
-                                        
-                                        let html = '';
-                                        for (let i = 1; i <= count; i++) {
-                                            html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa;">';
-                                            html += '<h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Topic ' + i + ' to Describe</h4>';
-                                            html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
-                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><input name="value" type="text" value="default-topic-' + i + '" style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                            html += '</tr></table></div>';
-                                        }
-                                        container.innerHTML = html;
-                                    }
-                                    
-                                    // Initialize with one topic
-                                    generateDescribeInputs();
-                                </script>
+                                <table><tr>
+                                <td><label>Topic Name</label><input name='value' type='text' value='default-topic'></td>
+                                <td><label>Cleanup Policy</label>
+                                <select name='value'>
+                                    <option value='Compact'>Compact</option>
+                                    <option value='Delete' selected>Delete</option>
+                                </select></td>
+                                <td><label>Retention Time (ms)</label><input name='value' type='number' value='604800000'></td>
+                                <td><label>Retention Size (bytes)</label><input name='value' type='number' value='-1'></td>
+                                <td><label>Max Message Bytes (bytes)</label><input name='value' type='number' value='2097164'></td>
+                                </tr></table>
                             """
                         } else if (Action == 'MANAGE_TOPIC:ERROR') {
                             return['MANAGE_TOPIC:ERROR']
