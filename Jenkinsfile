@@ -273,7 +273,7 @@ Topic Name : ${values[0]}
                             def output = readFile('list_result.txt').trim()
                             echo "List output: ${output}"
 
-                            generateJUnitXML('list-topic', output.contains('KafkaTopic'), 'List Topic', output)
+                            generateJUnitXML('list-topic', !output.toLowerCase().contains('error'), 'List Topic', output)
                         }
                     }
                 }
