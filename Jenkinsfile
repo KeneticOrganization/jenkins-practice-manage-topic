@@ -47,9 +47,7 @@ properties([
                         } else if (Action == 'Create') {
                             return """
                                 <table><tr>
-                                <div style="width: 630px;">
-                                <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg">
-                                </div>
+                                <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="width: 300px; height: auto; border: 2px solid #555; border-radius: 10px;">
                                 <td><label>Topic Name</label><input name='value' type='text' value='default-topic'></td>
                                 <td><label>Partitions</label><input name='value' type='number' value='6'></td>
                                 <td><label>Cleanup Policy</label>
