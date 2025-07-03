@@ -58,6 +58,7 @@ properties([
                                 <div id="topicInputsContainer"></div>
                                 
                                 <script>
+                                \'\'\'
                                     function generateTopicInputs() {
                                         const count = parseInt(document.getElementById('topicCount').value);
                                         const container = document.getElementById('topicInputsContainer');
@@ -80,6 +81,7 @@ properties([
                                     
                                     // Initialize with one topic
                                     generateTopicInputs();
+                                \'\'\'
                                 </script>
                             """
                         } else if (TopicAction == 'Update') {
