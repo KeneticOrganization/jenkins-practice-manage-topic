@@ -59,23 +59,25 @@ properties([
                                 <div id="topicInputsContainer"></div>
                                 
                                 <script>
-                                    const count = parseInt(document.getElementById('topicCount').value);
-                                    const container = document.getElementById('topicInputsContainer');
-                                    
-                                    let html = '';
-                                    for (let i = 1; i <= count; i++) {
-                                        html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa;">';
-                                        html += '<h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Topic ' + i + '</h4>';
-                                        html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
-                                        html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><input name="value" type="text" value="default-topic-' + i + '" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                        html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Partitions</label><input name="value" type="number" value="6" style="width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                        html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Cleanup Policy</label><select name="value" style="width: 130px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"><option value="Compact">Compact</option><option value="Compact & Delete">Compact & Delete</option><option value="Delete" selected>Delete</option></select></td>';
-                                        html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Time (ms)</label><input name="value" type="number" value="604800000" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                        html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Size (bytes)</label><input name="value" type="number" value="-1" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                        html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Max Message Bytes</label><input name="value" type="number" value="2097164" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                        html += '</tr></table></div>';
+                                    function generateTopicInputs() {
+                                        const count = parseInt(document.getElementById('topicCount').value);
+                                        const container = document.getElementById('topicInputsContainer');
+                                        
+                                        let html = '';
+                                        for (let i = 1; i <= count; i++) {
+                                            html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa;">';
+                                            html += '<h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Topic ' + i + '</h4>';
+                                            html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><input name="value" type="text" value="default-topic-' + i + '" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Partitions</label><input name="value" type="number" value="6" style="width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Cleanup Policy</label><select name="value" style="width: 130px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"><option value="Compact">Compact</option><option value="Compact & Delete">Compact & Delete</option><option value="Delete" selected>Delete</option></select></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Time (ms)</label><input name="value" type="number" value="604800000" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Size (bytes)</label><input name="value" type="number" value="-1" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Max Message Bytes</label><input name="value" type="number" value="2097164" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '</tr></table></div>';
+                                        }
+                                        container.innerHTML = html;
                                     }
-                                    container.innerHTML = html;
                                 </script>
                             """
                         } else if (TopicAction == 'Update') {
