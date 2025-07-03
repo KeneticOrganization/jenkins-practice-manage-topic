@@ -75,7 +75,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return['MANAGE_TOPIC:ERROR CODE 1']'''
+                        '''return['MANAGE_TOPIC:ERROR CODE 2']'''
                 ], 
                 $class: 'GroovyScript', 
                 script: [
@@ -146,10 +146,9 @@ properties([
                             }
                             return html
                         } else {
-                            def html =  """ 
-                                <label>This action didn't need any options.</label> 
+                            return """
+                                <label>This action didn't need any options.</label>
                             """
-                            return html
                         }
                         '''
                 ]
