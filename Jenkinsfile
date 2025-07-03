@@ -84,9 +84,9 @@ properties([
                     script: 
                         '''
                         def values = Amount.split(',').collect { it.trim() }.findAll { it }
+                        def count = values[0].isInteger() ? values[0].toInteger() : 1
                         if (TopicAction == 'Create') {
                             def html = ""
-                            def count = values[0].isInteger() ? values[0].toInteger() : 1
                             for (int i = 0; i < count; i++) {
                                 html += """
                                     <div style="margin-bottom: 10px;">
@@ -112,7 +112,6 @@ properties([
                             return html
                         } else if (TopicAction == 'Update') {
                             def html = ""
-                            def count = values[0].isInteger() ? values[0].toInteger() : 1
                             for (int i = 0; i < count; i++) {
                                 html += """
                                     <div style="margin-bottom: 10px;">
@@ -137,7 +136,6 @@ properties([
                             return html
                         } else if (TopicAction == 'Delete') {
                             def html = ""
-                            def count = values[0].isInteger() ? values[0].toInteger() : 1
                             for (int i = 0; i < count; i++) {
                                 html += """
                                     <div style="margin-bottom: 10px;">
@@ -182,13 +180,14 @@ pipeline {
         }
         stage('Confirmation'){
             when{
-                expression {return params.Action == 'Delete'}
+                expression {return params.TopicAction == 'Delete'}
             }
             agent none
             steps{
                 script {
                     def option = "${Option}"
                     def values = option.split(',').collect { it.trim() }.findAll { it }
+                    def count = ("${Amount}".split(',').collect { it.trim() }.findAll { it })[0].isInteger() ? values[0].toInteger() : 1
                     
                     def CONFIRM_NAME = input(
                         message: "Type the topic name to confirm deletion: '${values[0]}'",
@@ -213,7 +212,7 @@ pipeline {
             parallel{
                 stage('Create'){
                     when{
-                        expression {return params.Action == 'Create'}
+                        expression {return params.TopicAction == 'Create'}
                     }
                     steps{
                         script{
@@ -258,7 +257,7 @@ Max Message Bytes (bytes) : ${values[5]}
                 }
                 stage('Update'){
                     when{
-                        expression {return params.Action == 'Update'}
+                        expression {return params.TopicAction == 'Update'}
                     }
                     steps{
                         script{
@@ -301,7 +300,7 @@ Max Message Bytes (bytes) : ${values[4]}
                 }
                 stage('Describe'){
                     when{
-                        expression {return params.Action == 'Describe'}
+                        expression {return params.TopicAction == 'Describe'}
                     }
                     steps{
                         script{
@@ -327,7 +326,7 @@ Topic Name : ${values[0]}
                 }
                 stage('List'){
                     when{
-                        expression {return params.Action == 'List'}
+                        expression {return params.TopicAction == 'List'}
                     }
                     steps{
                         script{
@@ -347,7 +346,7 @@ Topic Name : ${values[0]}
                 }
                 stage('Delete'){
                     when{
-                        expression {return params.Action == 'Delete'}
+                        expression {return params.TopicAction == 'Delete'}
                     }
                     steps{
                         script{
