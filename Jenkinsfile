@@ -5,7 +5,7 @@ properties([
             description: 'What do you want to do?', 
             filterLength: 1, 
             filterable: false, 
-            name: 'Action',
+            name: 'TopicAction',
             script: [
                 $class: 'GroovyScript', 
                 fallbackScript: [
