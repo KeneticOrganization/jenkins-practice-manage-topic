@@ -145,6 +145,13 @@ properties([
                                 """
                             }
                             return html
+                        } else if (TopicAction == 'Describe'){
+                            return"""
+                                <div style="margin-bottom: 10px;">
+                                    <label for="option_${i}">Topic Name :</label>
+                                    <input type="text" id="option_1" name="value" value="topic-1" style="width: 300px;" />
+                                </div>
+                            """
                         } else {
                             return """
                                 <label>This action didn't need any options.</label>
@@ -363,15 +370,16 @@ Topic Name : ${values[0]}
                     }
                     steps{
                         script{
-                            def option = "${Option}"
-                            def values = option.split(',').collect { it.trim() }.findAll { it }
-                            echo env.confirmation
-                            echo """
-Topic Name : ${values[0]}
-                            """
+                            def values = "${Option}"split(',').collect { it.trim() }.findAll { it }
+
+                            def countStr = "${Amount}".split(',').collect { it.trim() }.findAll { it }
+                            def count = countStr[0].isInteger() ? countStr[0].toInteger() : 1
+
+                            def multipleTopicName = values[0..(count-1)].join(',')
+                            
                             if (env.confirmation){
                                 def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-topic', parameters: [
-                                    string(name: 'TopicName', value: "${values[0]}"),
+                                    string(name: 'TopicName', value: "${multipleTopicName}"),
                                     string(name: 'ParamsAsENV', value: 'true,'),
                                     string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
                                 ]
