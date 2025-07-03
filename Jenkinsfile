@@ -215,6 +215,58 @@ properties([
                                     })();
                                 </script>
                             """
+                        } else if (TopicAction == 'Describe') {
+                            return """
+                                <div style="width: 630px; margin-bottom: 15px;">
+                                    <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="max-width: 100%; height: auto;">
+                                </div>
+                                
+                                <div style="margin-bottom: 15px;">
+                                    <label style="font-weight: bold; color: #333;">Number of Topics to Describe:</label>
+                                    <input type="number" id="topicCountDescribe" min="1" value="1" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
+                                </div>
+                                
+                                <div id="topicDescribeContainer"></div>
+                                
+                                <script>
+                                    (function() {
+                                        function generateDescribeInputs() {
+                                            const countElement = document.getElementById('topicCountDescribe');
+                                            const container = document.getElementById('topicDescribeContainer');
+                                            
+                                            if (!countElement || !container) {
+                                                console.log('Describe elements not ready yet, retrying...');
+                                                setTimeout(generateDescribeInputs, 100);
+                                                return;
+                                            }
+                                            
+                                            const count = parseInt(countElement.value) || 1;
+                                            
+                                            let html = '';
+                                            for (let i = 1; i <= count; i++) {
+                                                html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #f0f8ff;">';
+                                                html += '<h4 style="margin: 0 0 15px 0; color: #1976d2; border-bottom: 1px solid #ddd; padding-bottom: 5px;">📋 Topic ' + i + ' to Describe</h4>';
+                                                html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
+                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><br><input name="value" type="text" value="default-topic-' + i + '" style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                                html += '</tr></table></div>';
+                                            }
+                                            container.innerHTML = html;
+                                        }
+                                        
+                                        window.generateDescribeInputs = generateDescribeInputs;
+                                        
+                                        setTimeout(function() {
+                                            generateDescribeInputs();
+                                            
+                                            const countInput = document.getElementById('topicCountDescribe');
+                                            if (countInput) {
+                                                countInput.addEventListener('change', generateDescribeInputs);
+                                                countInput.addEventListener('input', generateDescribeInputs);
+                                            }
+                                        }, 200);
+                                    })();
+                                </script>
+                            """
                         } else if (TopicAction == 'MANAGE_TOPIC:ERROR') {
                             return['MANAGE_TOPIC:ERROR CODE 2']
                         } else {
