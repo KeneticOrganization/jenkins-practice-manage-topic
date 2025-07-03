@@ -102,9 +102,15 @@ pipeline {
             steps{
                 script{
                     def props = readProperties file: 'env.properties'
-                    env.REST_ENDPOINT = props.REST_ENDPOINT
-                    env.CLUSTER_ID = props.CLUSTER_ID
-                    env.CONNECTION_TYPE = props.CONNECTION_TYPE
+                    if(props.CONNECTION_TYPE == 'Platform,KafkaTools'){
+                        env.params_1 = props.BOOTSTRAP_SERVER.replaceAll(",", ";")
+                        env.params_2 = props.KAFKA_TOOLS_PATH
+                    }
+                    else{
+                        env.params_1 = props.REST_ENDPOINT
+                        env.params_2 = props.CLUSTER_ID
+                    }
+                    env.CONNECTION_TYPE = props.CONNECTION_TYPE.replaceAll(",", ";")
                 }
             }
         }
@@ -172,7 +178,7 @@ Max Message Bytes (bytes) : ${values[5]}
                                 string(name: 'RetentionSize', value: "${values[4]}"), 
                                 string(name: 'MaxMessageBytes', value: "${values[5]}"),
                                 string(name: 'ParamsAsENV', value: 'true,'),
-                                string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID},${CONNECTION_TYPE},")
+                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
                             ]
 
                             copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'create_result.txt')
@@ -215,7 +221,7 @@ Max Message Bytes (bytes) : ${values[4]}
                                 string(name: 'RetentionSize', value: "${values[3]}"), 
                                 string(name: 'MaxMessageBytes', value: "${values[4]}"),
                                 string(name: 'ParamsAsENV', value: 'true,'),
-                                string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID},${CONNECTION_TYPE},")
+                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
                             ]
 
                             copyArtifacts(projectName: updateResult.projectName, selector: specific("${updateResult.number}"), filter: 'update_result.txt')
@@ -241,7 +247,7 @@ Topic Name : ${values[0]}
                             def describeResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/describe-topic', parameters: [
                                 string(name: 'TopicName', value: "${values[0]}"),
                                 string(name: 'ParamsAsENV', value: 'true,'),
-                                string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID},${CONNECTION_TYPE},")
+                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
                             ]
 
                             copyArtifacts(projectName: describeResult.projectName, selector: specific("${describeResult.number}"), filter: 'describe_result.txt')
@@ -261,7 +267,7 @@ Topic Name : ${values[0]}
                         script{
                             def listResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/list-topic', parameters: [
                                 string(name: 'ParamsAsENV', value: 'true,'),
-                                string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID},${CONNECTION_TYPE},")
+                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
                             ]
 
                             copyArtifacts(projectName: listResult.projectName, selector: specific("${listResult.number}"), filter: 'list_result.txt')
@@ -289,7 +295,7 @@ Topic Name : ${values[0]}
                                 def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-topic', parameters: [
                                     string(name: 'TopicName', value: "${values[0]}"),
                                     string(name: 'ParamsAsENV', value: 'true,'),
-                                    string(name: 'ENVIRONMENT_PARAMS', value: "${REST_ENDPOINT},${CLUSTER_ID},${CONNECTION_TYPE},")
+                                    string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
                                 ]
 
                                 copyArtifacts(projectName: deleteResult.projectName, selector: specific("${deleteResult.number}"), filter: 'delete_result.txt')
