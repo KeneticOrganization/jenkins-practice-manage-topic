@@ -378,7 +378,7 @@ Topic Name : ${values[0]}
                             def multipleTopicName = values[0..(count-1)].join(',')
                             
                             if (env.confirmation){
-                                def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-topic', parameters: [
+                                def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-topic-multiple', parameters: [
                                     string(name: 'TopicName', value: "${multipleTopicName}"),
                                     string(name: 'ParamsAsENV', value: 'true,'),
                                     string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
