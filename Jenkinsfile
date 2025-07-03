@@ -82,7 +82,7 @@ properties([
                                     generateTopicInputs();
                                 </script>
                             """
-                        } else if (Action == 'Update') {
+                        } else if (TopicAction == 'Update') {
                             return """
                                 <div style="width: 630px; margin-bottom: 15px;">
                                     <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="max-width: 100%; height: auto;">
@@ -119,7 +119,7 @@ properties([
                                     generateUpdateInputs();
                                 </script>
                             """
-                        } else if (Action == 'Delete') {
+                        } else if (TopicAction == 'Delete') {
                             return """
                                 <div style="width: 630px; margin-bottom: 15px;">
                                     <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="max-width: 100%; height: auto;">
@@ -152,7 +152,7 @@ properties([
                                     generateDeleteInputs();
                                 </script>
                             """
-                        } else if (Action == 'Describe') {
+                        } else if (TopicAction == 'Describe') {
                             return """
                                 <div style="width: 630px; margin-bottom: 15px;">
                                     <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="max-width: 100%; height: auto;">
@@ -185,7 +185,7 @@ properties([
                                     generateDescribeInputs();
                                 </script>
                             """
-                        } else if (Action == 'MANAGE_TOPIC:ERROR') {
+                        } else if (TopicAction == 'MANAGE_TOPIC:ERROR') {
                             return['MANAGE_TOPIC:ERROR CODE 2']
                         } else {
                             return """
