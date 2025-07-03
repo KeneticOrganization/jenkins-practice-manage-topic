@@ -85,6 +85,7 @@ properties([
                         '''
                         def values = Amount.split(',').collect { it.trim() }.findAll { it }
                         if (TopicAction == 'Create') {
+                            def html = ""
                             def count = values[0].isInteger() ? values[0].toInteger() : 1
                             for (int i = 0; i < count; i++) {
                                 html += """
