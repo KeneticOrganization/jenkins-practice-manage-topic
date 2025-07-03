@@ -34,7 +34,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return['MANAGE_TOPIC:ERROR']'''
+                        '''return['MANAGE_TOPIC:ERROR CODE 1']'''
                 ], 
                 $class: 'GroovyScript', 
                 script: [
@@ -186,7 +186,7 @@ properties([
                                 </script>
                             """
                         } else if (Action == 'MANAGE_TOPIC:ERROR') {
-                            return['MANAGE_TOPIC:ERROR']
+                            return['MANAGE_TOPIC:ERROR CODE 2']
                         } else {
                             return """
                                 <table><tr>
