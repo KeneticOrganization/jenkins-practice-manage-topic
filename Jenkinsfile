@@ -44,7 +44,7 @@ properties([
                         '''
                         if (TopicAction == 'List'){
                             return """
-                            <label>This action didn't need any options.</label>
+                            <label>This action didn't have amount of topic setting.</label>
                             """
                         } else if (TopicAction == 'Create' || TopicAction == 'Update' || TopicAction == 'Delete') {
                             return """
@@ -56,7 +56,7 @@ properties([
                             return['MANAGE_TOPIC:ERROR CODE 0']
                         } else {
                             return """
-                                <div></div>
+                                <label>This action didn't have amount of topic setting.</label>
                             """
                         }
                         '''
@@ -110,8 +110,32 @@ properties([
                                 </tr></table>
                             """
                             return html
-                        } else {
-                            return "<div></div>"
+                        } else if (TopicAction == 'Update') {
+                            def html = ""
+                            def count = values[0].isInteger() ? values[0].toInteger() : 1
+                            for (int i = 0; i < count; i++) {
+                                html += """
+                                    <div style="margin-bottom: 10px;">
+                                        <label for="option_${i}">Topic Name ${i + 1}:</label>
+                                        <input type="text" id="option_${i}" name="value" value="topic-${i + 1}" style="width: 300px;" />
+                                    </div>
+                                """
+                            }
+                            html += """
+                                <table><tr>
+                                <td><label>Cleanup Policy</label>
+                                <select name='value'>
+                                    <option value='Compact'>Compact</option>
+                                    <option value='Delete' selected>Delete</option>
+                                </select></td>
+                                <td><label>Retention Time (ms)</label><input name='value' type='number' value='604800000'></td>
+                                <td><label>Retention Size (bytes)</label><input name='value' type='number' value='-1'></td>
+                                <td><label>Max Message Bytes (bytes)</label><input name='value' type='number' value='2097164'></td>
+                                </tr></table>
+                            """
+                            return html
+                        } else  {
+                            return <label>This action didn't need any options.</label>
                         }
                         '''
                 ]
