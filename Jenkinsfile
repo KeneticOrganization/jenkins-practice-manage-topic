@@ -59,12 +59,12 @@ properties([
                                 <div id="topicInputsContainer"></div>
                                 
                                 <script>
-                                    function generateTopicInputs() {
-                                        console.log("1")
-                                    }
-                                    
-                                    // Initialize with one topic
-                                    generateTopicInputs();
+function generateTopicInputs() {
+    console.log("1")
+}
+
+// Initialize with one topic
+generateTopicInputs();
                                 </script>
                             """
                         } else if (TopicAction == 'Update') {
