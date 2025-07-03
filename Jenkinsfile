@@ -185,25 +185,33 @@ pipeline {
             agent none
             steps{
                 script {
-                    def option = "${Option}"
-                    def values = option.split(',').collect { it.trim() }.findAll { it }
-                    def count = ("${Amount}".split(',').collect { it.trim() }.findAll { it })[0].isInteger() ? values[0].toInteger() : 1
-                    
-                    def CONFIRM_NAME = input(
-                        message: "Type the topic name to confirm deletion: '${values[0]}'",
-                        parameters: [
-                            string(defaultValue: '', description: 'Re-type the topic name exactly to confirm', name: 'CONFIRM_NAME')
-                        ],
-                        ok: "Confirm",
-                        cancel: "Cancel"
-                    )
-                    
-                    def confirmation = true
-        
-                    if (CONFIRM_NAME != values[0]) {
-                        confirmation = false
+                    def values = "${Option}".split(',').collect { it.trim() }.findAll { it }
+
+                    def countStr = "${Amount}".split(',').collect { it.trim() }.findAll { it }
+                    def count = countStr[0].isInteger() ? countStr[0].toInteger() : 1
+
+                    if (values.size() < count) {
+                        error "Number of topic names (${values.size()}) is less than expected (${count})"
                     }
-                    
+
+                    def confirmation = true
+                    for (int i = 0; i < count; i++) {
+                        def topicName = values[i]
+                        def CONFIRM_NAME = input(
+                            message: "Type the topic name to confirm deletion: '${topicName}'",
+                            parameters: [
+                                string(defaultValue: '', description: "Re-type '${topicName}' exactly to confirm", name: 'CONFIRM_NAME')
+                            ],
+                            ok: "Confirm",
+                            cancel: "Cancel"
+                        )
+
+                        if (CONFIRM_NAME != topicName) {
+                            confirmation = false
+                            break
+                        }
+                    }
+
                     env.confirmation = confirmation
                 }
             }
@@ -216,40 +224,48 @@ pipeline {
                     }
                     steps{
                         script{
-                            def option = "${Option}"
-                            def values = option.split(',').collect { it.trim() }.findAll { it }
-                            if (values[3] == 'delete') {
-                                values[2] = "${values[2]},${values[3]}"
+                            def values = "${Option}".split(',').collect { it.trim() }.findAll { it }
+
+                            def countStr = "${Amount}".split(',').collect { it.trim() }.findAll { it }
+                            def count = countStr[0].isInteger() ? countStr[0].toInteger() : 1
+
+                            //If count = 2 then 
+                            // 0 is Topic Name
+                            // 1 is Topic Name
+                            // 2 is Partition
+                            // 3 is CleanupPolicy
+                            // 4 is RetentionTime
+                            // 5 is RetentionSize
+                            // 6 is MaxMessageBytes
+
+                            if (values[count + 2] == 'delete') {
+                                values[count + 1] = "${values[count + 1]},${values[count + 2]}"
                                 
-                                values[3] = values[4]
-                                values[4] = values[5]
-                                values[5] = values[6]
+                                values[count + 2] = values[count + 3]
+                                values[count + 3] = values[count + 4]
+                                values[count + 4] = values[count + 5]
                                 
-                                values = values.take(6)
+                                values = values.take(count + 5)
                             }
-                            echo """
-Topic Name : ${values[0]}
-Partition : ${values[1]}
-Cleanup Policy : ${values[2]}
-Retention Time (ms) : ${values[3]}
-Retention Size (bytes) : ${values[4]}
-Max Message Bytes (bytes) : ${values[5]}
-                            """
-                            def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-topic-Jenkins', parameters: [
-                                string(name: 'TopicName', value: "${values[0]}"), 
-                                string(name: 'Partitions', value: "${values[1]}"), 
-                                string(name: 'CleanupPolicy', value: "${values[2]}"), 
-                                string(name: 'RetentionTime', value: "${values[3]}"), 
-                                string(name: 'RetentionSize', value: "${values[4]}"), 
-                                string(name: 'MaxMessageBytes', value: "${values[5]}"),
-                                string(name: 'ParamsAsENV', value: 'true,'),
-                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
-                            ]
+                            def output = ""
+                            for (int i=0; i < count; i++) {
+                                def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-topic-Jenkins', parameters: [
+                                    string(name: 'TopicName', value: "${values[i]}"), 
+                                    string(name: 'Partitions', value: "${values[count]}"), 
+                                    string(name: 'CleanupPolicy', value: "${values[count+1]}"), 
+                                    string(name: 'RetentionTime', value: "${values[count+2]}"), 
+                                    string(name: 'RetentionSize', value: "${values[count+3]}"), 
+                                    string(name: 'MaxMessageBytes', value: "${values[count+4]}"),
+                                    string(name: 'ParamsAsENV', value: 'true,'),
+                                    string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
+                                ]
 
-                            copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'create_result.txt')
+                                copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'create_result.txt')
 
-                            def output = readFile('create_result.txt').trim()
-                            echo "Creating output: ${output}"
+                                def outputFile = readFile('create_result.txt').trim()
+                                output += "${outputFile}\n"
+                                echo "Creating output: ${outputFile}"
+                            }
 
                             generateJUnitXML('create-topic', output.contains('Success') || output.contains('created'), 'Create Topic', output)
                         }
