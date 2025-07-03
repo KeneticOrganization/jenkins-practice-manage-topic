@@ -51,14 +51,14 @@ properties([
                                 </div>
                                 
                                 <div style="margin-bottom: 15px;">
-                                    <label style="font-weight: bold; color: #333;">Number of Topics to Create:</label>
-                                    <input type="number" id="topicCount" min="1" value="1" onchange="generateTopicInputs()" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
+                                    <label style="font-weight: bold;">Number of Topics to Create:
+                                        <input type="number" id="topicCount" min="1" value="1" onchange="generateTopicInputs()" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
+                                    </label>
                                 </div>
                                 
                                 <div id="topicInputsContainer"></div>
                                 
                                 <script>
-                                \'\'\'
                                     function generateTopicInputs() {
                                         const count = parseInt(document.getElementById('topicCount').value);
                                         const container = document.getElementById('topicInputsContainer');
@@ -81,7 +81,6 @@ properties([
                                     
                                     // Initialize with one topic
                                     generateTopicInputs();
-                                \'\'\'
                                 </script>
                             """
                         } else if (TopicAction == 'Update') {
