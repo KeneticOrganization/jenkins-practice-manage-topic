@@ -158,9 +158,6 @@ properties([
 ])
 pipeline {
     agent any
-    environment {
-        API_KEY = credentials('BASE64_API_KEY')
-    }
     stages {
         stage('Setup Environment') {
             steps{
@@ -248,24 +245,24 @@ pipeline {
                                 values = values.take(count + 5)
                             }
                             def output = ""
-                            for (int i=0; i < count; i++) {
-                                def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-topic-Jenkins', parameters: [
-                                    string(name: 'TopicName', value: "${values[i]}"), 
-                                    string(name: 'Partitions', value: "${values[count]}"), 
-                                    string(name: 'CleanupPolicy', value: "${values[count+1]}"), 
-                                    string(name: 'RetentionTime', value: "${values[count+2]}"), 
-                                    string(name: 'RetentionSize', value: "${values[count+3]}"), 
-                                    string(name: 'MaxMessageBytes', value: "${values[count+4]}"),
-                                    string(name: 'ParamsAsENV', value: 'true,'),
-                                    string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
-                                ]
+                            def multipleTopicName = values[0:count-1].join(',')
 
-                                copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'create_result.txt')
+                            def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-topic-multiple', parameters: [
+                                string(name: 'TopicName', value: "${multipleTopicName}"), 
+                                string(name: 'Partitions', value: "${values[count]}"), 
+                                string(name: 'CleanupPolicy', value: "${values[count+1]}"), 
+                                string(name: 'RetentionTime', value: "${values[count+2]}"), 
+                                string(name: 'RetentionSize', value: "${values[count+3]}"), 
+                                string(name: 'MaxMessageBytes', value: "${values[count+4]}"),
+                                string(name: 'ParamsAsENV', value: 'true,'),
+                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
+                            ]
 
-                                def outputFile = readFile('create_result.txt').trim()
-                                output += "${outputFile}\n"
-                                echo "Creating output: ${outputFile}"
-                            }
+                            copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'create_result.txt')
+
+                            def outputFile = readFile('create_result.txt').trim()
+                            output += "${outputFile}\n"
+                            echo "Creating output: ${outputFile}"
 
                             generateJUnitXML('create-topic', output.contains('Success') || output.contains('created'), 'Create Topic', output)
                         }
