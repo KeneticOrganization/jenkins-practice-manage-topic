@@ -70,7 +70,7 @@ pipeline {
         CP_API_KEY = credentials('CP_BASE64_API_KEY')
     }
     parameters {
-        string(name: 'TopicName', defaultValue: 'default-topic', description: 'String')
+        string(name: 'TopicName', defaultValue: 'default-topic', description: 'Topic name(s) - use comma to separate multiple topics')
         string(name: 'Partitions', defaultValue: '6', description: 'Integer')
         choice(name: 'CleanupPolicy', choices: [
             'Compact', 'Delete', 'Compact & Delete'
@@ -124,7 +124,7 @@ pipeline {
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                     }
 
-                    // Create Topic Part
+                    // Cleanup Policy setup
                     def cleanPolicy = ""
                     if (params.CleanupPolicy == "Compact") {
                         cleanPolicy = "compact"
@@ -135,63 +135,94 @@ pipeline {
                     else if (params.CleanupPolicy == "Compact & Delete") {
                         cleanPolicy = "compact,delete"
                     }
+                    
+                    // Store cleanup policy for use in topic creation
+                    env.CLEANUP_POLICY = cleanPolicy
+                    
                     echo """
-Topic Name : ${params.TopicName}
+Topic Name(s) : ${params.TopicName}
 Partition : ${params.Partitions}
 Cleanup Policy : ${cleanPolicy}
 Retention Time (ms) : ${params.RetentionTime}
 Retention Size (bytes) : ${params.RetentionSize}
 Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
-                    env.HasTopic = "curl -s ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics\" | grep -c \"\\\"topic_name\\\":\\\"${params.TopicName}\\\"\""
-                    env.Command = """
-                    curl -s ${env.Auth} -H 'Content-Type: application/json' --request POST --url "${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics" \
-                        -d "{
-                            \\"topic_name\\":\\"${params.TopicName}\\",
-                            \\"partitions_count\\":\\"${params.Partitions}\\",
-                            \\"configs\\": [
-                                { \\"name\\": \\"cleanup.policy\\", \\"value\\": \\"${cleanPolicy}\\" },
-                                { \\"name\\": \\"retention.ms\\", \\"value\\": ${params.RetentionTime} },
-                                { \\"name\\": \\"retention.bytes\\", \\"value\\": ${params.RetentionSize} },
-                                { \\"name\\": \\"max.message.bytes\\", \\"value\\": ${params.MaxMessageBytes} }
-                            ]
-                        }"
-                    """
-                    if (env_params[2] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE == 'Platform,KafkaTools'){
-                        env.Sort = ""
-                        env.HasTopic = "${env.KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${env.BOOTSTRAP_SERVER} --list --command-config ${env.KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq \"${params.TopicName}\""
-                        env.Command = """${env.KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${env.BOOTSTRAP_SERVER} --command-config ${env.KAFKA_TOOLS_PATH}/config/kafka-config.properties \
-                                    --create \
-                                    --topic ${params.TopicName} \
-                                    --partitions ${params.Partitions} \
-                                    --replication-factor 1 \
-                                    --config cleanup.policy=${cleanPolicy} \
-                                    --config retention.ms=${params.RetentionTime} \
-                                    --config retention.bytes=${params.RetentionSize} \
-                                    --config max.message.bytes=${params.MaxMessageBytes}
-                        """
-                    }
                 }
             }
         }
-        stage('Create Topic'){
+        stage('Create Topics'){
             steps{
                 script{
-                    def createResult = sh(
-                        script: """
-                            if ! ${env.HasTopic} ; then
-                                ${env.Command}
-                                
-                                echo "Successful created topic name \"${params.TopicName}\"."
-                            else
-                                echo "Already has topic name \"${params.TopicName}\"."
-                            fi
-                        """,
-                        returnStdout: true
-                    ).trim()
-
-                    writeFile file: 'create_result.txt', text: createResult
+                    // Split topic names by comma and trim whitespace
+                    def topicNames = params.TopicName.split(',').collect { it.trim() }.findAll { it }
+                    def allResults = []
+                    
+                    echo "Found ${topicNames.size()} topic(s) to create: ${topicNames.join(', ')}"
+                    
+                    // Loop through each topic name
+                    for (String topicName : topicNames) {
+                        echo "Processing topic: ${topicName}"
+                        
+                        // Set up commands for current topic
+                        def hasTopicCommand = ""
+                        def createCommand = ""
+                        
+                        if (env.BOOTSTRAP_SERVER && env.KAFKA_TOOLS_PATH) {
+                            // Platform KafkaTools approach
+                            hasTopicCommand = "${env.KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${env.BOOTSTRAP_SERVER} --list --command-config ${env.KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq \"${topicName}\""
+                            createCommand = """${env.KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${env.BOOTSTRAP_SERVER} --command-config ${env.KAFKA_TOOLS_PATH}/config/kafka-config.properties \
+                                        --create \
+                                        --topic ${topicName} \
+                                        --partitions ${params.Partitions} \
+                                        --replication-factor 1 \
+                                        --config cleanup.policy=${env.CLEANUP_POLICY} \
+                                        --config retention.ms=${params.RetentionTime} \
+                                        --config retention.bytes=${params.RetentionSize} \
+                                        --config max.message.bytes=${params.MaxMessageBytes}
+                            """
+                        } else {
+                            // REST API approach
+                            hasTopicCommand = "curl -s ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics\" | grep -c \"\\\"topic_name\\\":\\\"${topicName}\\\"\""
+                            createCommand = """
+                            curl -s ${env.Auth} -H 'Content-Type: application/json' --request POST --url "${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics" \
+                                -d "{
+                                    \\"topic_name\\":\\"${topicName}\\",
+                                    \\"partitions_count\\":\\"${params.Partitions}\\",
+                                    \\"configs\\": [
+                                        { \\"name\\": \\"cleanup.policy\\", \\"value\\": \\"${env.CLEANUP_POLICY}\\" },
+                                        { \\"name\\": \\"retention.ms\\", \\"value\\": ${params.RetentionTime} },
+                                        { \\"name\\": \\"retention.bytes\\", \\"value\\": ${params.RetentionSize} },
+                                        { \\"name\\": \\"max.message.bytes\\", \\"value\\": ${params.MaxMessageBytes} }
+                                    ]
+                                }"
+                            """
+                        }
+                        
+                        // Execute topic creation for current topic
+                        def createResult = sh(
+                            script: """
+                                if ! ${hasTopicCommand} ; then
+                                    echo "Creating topic: ${topicName}"
+                                    ${createCommand}
+                                    
+                                    echo "Successfully created topic name \"${topicName}\"."
+                                else
+                                    echo "Already has topic name \"${topicName}\"."
+                                fi
+                            """,
+                            returnStdout: true
+                        ).trim()
+                        
+                        allResults.add("=== Topic: ${topicName} ===\n${createResult}")
+                        echo "Completed processing topic: ${topicName}"
+                    }
+                    
+                    // Write all results to file
+                    def finalResult = allResults.join('\n\n')
+                    writeFile file: 'create_result.txt', text: finalResult
                     archiveArtifacts artifacts: 'create_result.txt'
+                    
+                    echo "All topics processing completed. Results archived in create_result.txt"
                 }
             }
         }
