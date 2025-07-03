@@ -83,7 +83,7 @@ properties([
                     sandbox: true, 
                     script: 
                         '''
-                        def values = Amount.split(',').collect { it.trim() }.findAll { it }
+                        def values = Amount?.split(',')?.collect { it.trim() }?.findAll { it } ?: ['1']
                         def count = values[0].isInteger() ? values[0].toInteger() : 1
                         if (TopicAction == 'Create') {
                             def html = ""
