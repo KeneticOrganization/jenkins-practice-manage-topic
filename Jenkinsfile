@@ -201,7 +201,7 @@ properties([
     ])
 ])
 pipeline {
-    agent none
+    agent any
     environment {
         API_KEY = credentials('BASE64_API_KEY')
     }
@@ -226,6 +226,7 @@ pipeline {
             when{
                 expression {return params.Action == 'Delete'}
             }
+            agent none
             steps{
                 script {
                     def option = "${Option}"
