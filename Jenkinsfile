@@ -46,6 +46,15 @@ properties([
                             return "<label>This action didn't need any options.</label>"
                         } else if (TopicAction == 'Create') {
                             return """
+                                <script>
+function generateTopicInputs() {
+    console.log("1")
+}
+
+// Initialize with one topic
+generateTopicInputs();
+                                </script>
+                                
                                 <div style="width: 630px; margin-bottom: 15px;">
                                     <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="max-width: 100%; height: auto;">
                                 </div>
@@ -58,14 +67,6 @@ properties([
                                 
                                 <div id="topicInputsContainer"></div>
                                 
-                                <script>
-function generateTopicInputs() {
-    console.log("1")
-}
-
-// Initialize with one topic
-generateTopicInputs();
-                                </script>
                             """
                         } else if (TopicAction == 'Update') {
                             return """
