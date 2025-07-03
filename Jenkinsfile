@@ -245,7 +245,7 @@ pipeline {
                                 values = values.take(count + 5)
                             }
                             def output = ""
-                            def multipleTopicName = values[0:count-1].join(',')
+                            def multipleTopicName = values[0..(count-1)].join(',')
 
                             def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-topic-multiple', parameters: [
                                 string(name: 'TopicName', value: "${multipleTopicName}"), 
