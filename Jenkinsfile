@@ -52,57 +52,34 @@ properties([
                                 
                                 <div style="margin-bottom: 15px;">
                                     <label style="font-weight: bold; color: #333;">Number of Topics to Create:</label>
-                                    <input type="number" id="topicCount" min="1" value="1" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
+                                    <input type="number" id="topicCount" min="1" value="1" onchange="generateTopicInputs()" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
                                 </div>
                                 
                                 <div id="topicInputsContainer"></div>
                                 
                                 <script>
-                                    // Wait for DOM to be ready
-                                    (function() {
-                                        function generateTopicInputs() {
-                                            const countElement = document.getElementById('topicCount');
-                                            const container = document.getElementById('topicInputsContainer');
-                                            
-                                            if (!countElement || !container) {
-                                                console.log('Elements not ready yet, retrying...');
-                                                setTimeout(generateTopicInputs, 100);
-                                                return;
-                                            }
-                                            
-                                            const count = parseInt(countElement.value) || 1;
-                                            
-                                            let html = '';
-                                            for (let i = 1; i <= count; i++) {
-                                                html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa;">';
-                                                html += '<h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Topic ' + i + '</h4>';
-                                                html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><br><input name="value" type="text" value="default-topic-' + i + '" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Partitions</label><br><input name="value" type="number" value="6" style="width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Cleanup Policy</label><br><select name="value" style="width: 130px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"><option value="Compact">Compact</option><option value="Compact & Delete">Compact & Delete</option><option value="Delete" selected>Delete</option></select></td>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Time (ms)</label><br><input name="value" type="number" value="604800000" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Size (bytes)</label><br><input name="value" type="number" value="-1" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Max Message Bytes</label><br><input name="value" type="number" value="2097164" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                                html += '</tr></table></div>';
-                                            }
-                                            container.innerHTML = html;
+                                    function generateTopicInputs() {
+                                        const count = parseInt(document.getElementById('topicCount').value);
+                                        const container = document.getElementById('topicInputsContainer');
+                                        
+                                        let html = '';
+                                        for (let i = 1; i <= count; i++) {
+                                            html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa;">';
+                                            html += '<h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Topic ' + i + '</h4>';
+                                            html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><input name="value" type="text" value="default-topic-' + i + '" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Partitions</label><input name="value" type="number" value="6" style="width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Cleanup Policy</label><select name="value" style="width: 130px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"><option value="Compact">Compact</option><option value="Compact & Delete">Compact & Delete</option><option value="Delete" selected>Delete</option></select></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Time (ms)</label><input name="value" type="number" value="604800000" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Size (bytes)</label><input name="value" type="number" value="-1" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Max Message Bytes</label><input name="value" type="number" value="2097164" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '</tr></table></div>';
                                         }
-                                        
-                                        // Make function globally available
-                                        window.generateTopicInputs = generateTopicInputs;
-                                        
-                                        // Initialize after a short delay to ensure DOM is ready
-                                        setTimeout(function() {
-                                            generateTopicInputs();
-                                            
-                                            // Add event listener
-                                            const countInput = document.getElementById('topicCount');
-                                            if (countInput) {
-                                                countInput.addEventListener('change', generateTopicInputs);
-                                                countInput.addEventListener('input', generateTopicInputs);
-                                            }
-                                        }, 200);
-                                    })();
+                                        container.innerHTML = html;
+                                    }
+                                    
+                                    // Initialize with one topic
+                                    generateTopicInputs();
                                 </script>
                             """
                         } else if (TopicAction == 'Update') {
@@ -113,52 +90,33 @@ properties([
                                 
                                 <div style="margin-bottom: 15px;">
                                     <label style="font-weight: bold; color: #333;">Number of Topics to Update:</label>
-                                    <input type="number" id="topicCountUpdate" min="1" value="1" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
+                                    <input type="number" id="topicCountUpdate" min="1" value="1" onchange="generateUpdateInputs()" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
                                 </div>
                                 
                                 <div id="topicUpdateContainer"></div>
                                 
                                 <script>
-                                    (function() {
-                                        function generateUpdateInputs() {
-                                            const countElement = document.getElementById('topicCountUpdate');
-                                            const container = document.getElementById('topicUpdateContainer');
-                                            
-                                            if (!countElement || !container) {
-                                                console.log('Update elements not ready yet, retrying...');
-                                                setTimeout(generateUpdateInputs, 100);
-                                                return;
-                                            }
-                                            
-                                            const count = parseInt(countElement.value) || 1;
-                                            
-                                            let html = '';
-                                            for (let i = 1; i <= count; i++) {
-                                                html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa;">';
-                                                html += '<h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Topic ' + i + ' Update</h4>';
-                                                html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><br><input name="value" type="text" value="default-topic-' + i + '" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Cleanup Policy</label><br><select name="value" style="width: 130px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"><option value="Compact">Compact</option><option value="Delete" selected>Delete</option></select></td>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Time (ms)</label><br><input name="value" type="number" value="604800000" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Size (bytes)</label><br><input name="value" type="number" value="-1" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Max Message Bytes</label><br><input name="value" type="number" value="2097164" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                                html += '</tr></table></div>';
-                                            }
-                                            container.innerHTML = html;
+                                    function generateUpdateInputs() {
+                                        const count = parseInt(document.getElementById('topicCountUpdate').value);
+                                        const container = document.getElementById('topicUpdateContainer');
+                                        
+                                        let html = '';
+                                        for (let i = 1; i <= count; i++) {
+                                            html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa;">';
+                                            html += '<h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Topic ' + i + ' Update</h4>';
+                                            html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><input name="value" type="text" value="default-topic-' + i + '" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Cleanup Policy</label><select name="value" style="width: 130px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"><option value="Compact">Compact</option><option value="Delete" selected>Delete</option></select></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Time (ms)</label><input name="value" type="number" value="604800000" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Retention Size (bytes)</label><input name="value" type="number" value="-1" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Max Message Bytes</label><input name="value" type="number" value="2097164" style="width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '</tr></table></div>';
                                         }
-                                        
-                                        window.generateUpdateInputs = generateUpdateInputs;
-                                        
-                                        setTimeout(function() {
-                                            generateUpdateInputs();
-                                            
-                                            const countInput = document.getElementById('topicCountUpdate');
-                                            if (countInput) {
-                                                countInput.addEventListener('change', generateUpdateInputs);
-                                                countInput.addEventListener('input', generateUpdateInputs);
-                                            }
-                                        }, 200);
-                                    })();
+                                        container.innerHTML = html;
+                                    }
+                                    
+                                    // Initialize with one topic
+                                    generateUpdateInputs();
                                 </script>
                             """
                         } else if (TopicAction == 'Delete') {
@@ -169,50 +127,29 @@ properties([
                                 
                                 <div style="margin-bottom: 15px;">
                                     <label style="font-weight: bold; color: #333;">Number of Topics to Delete:</label>
-                                    <input type="number" id="topicCountDelete" min="1" value="1" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
+                                    <input type="number" id="topicCountDelete" min="1" value="1" onchange="generateDeleteInputs()" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
                                 </div>
                                 
                                 <div id="topicDeleteContainer"></div>
                                 
                                 <script>
-                                    (function() {
-                                        function generateDeleteInputs() {
-                                            const countElement = document.getElementById('topicCountDelete');
-                                            const container = document.getElementById('topicDeleteContainer');
-                                            
-                                            if (!countElement || !container) {
-                                                console.log('Delete elements not ready yet, retrying...');
-                                                setTimeout(generateDeleteInputs, 100);
-                                                return;
-                                            }
-                                            
-                                            const count = parseInt(countElement.value) || 1;
-                                            
-                                            let html = '';
-                                            for (let i = 1; i <= count; i++) {
-                                                html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #ffe6e6;">';
-                                                html += '<h4 style="margin: 0 0 15px 0; color: #d32f2f; border-bottom: 1px solid #ddd; padding-bottom: 5px;">⚠️ Topic ' + i + ' to Delete</h4>';
-                                                html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><br><input name="value" type="text" value="default-topic-' + i + '" style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                                html += '</tr></table>';
-                                                html += '<div style="margin-top: 10px; padding: 10px; background: #ffebee; border-radius: 3px; color: #d32f2f;"><strong>Warning:</strong> This action will permanently delete the topic and all its data.</div>';
-                                                html += '</div>';
-                                            }
-                                            container.innerHTML = html;
+                                    function generateDeleteInputs() {
+                                        const count = parseInt(document.getElementById('topicCountDelete').value);
+                                        const container = document.getElementById('topicDeleteContainer');
+                                        
+                                        let html = '';
+                                        for (let i = 1; i <= count; i++) {
+                                            html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa;">';
+                                            html += '<h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Topic ' + i + ' to Delete</h4>';
+                                            html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><input name="value" type="text" value="default-topic-' + i + '" style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '</tr></table></div>';
                                         }
-                                        
-                                        window.generateDeleteInputs = generateDeleteInputs;
-                                        
-                                        setTimeout(function() {
-                                            generateDeleteInputs();
-                                            
-                                            const countInput = document.getElementById('topicCountDelete');
-                                            if (countInput) {
-                                                countInput.addEventListener('change', generateDeleteInputs);
-                                                countInput.addEventListener('input', generateDeleteInputs);
-                                            }
-                                        }, 200);
-                                    })();
+                                        container.innerHTML = html;
+                                    }
+                                    
+                                    // Initialize with one topic
+                                    generateDeleteInputs();
                                 </script>
                             """
                         } else if (TopicAction == 'Describe') {
@@ -223,48 +160,29 @@ properties([
                                 
                                 <div style="margin-bottom: 15px;">
                                     <label style="font-weight: bold; color: #333;">Number of Topics to Describe:</label>
-                                    <input type="number" id="topicCountDescribe" min="1" value="1" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
+                                    <input type="number" id="topicCountDescribe" min="1" value="1" onchange="generateDescribeInputs()" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100px; margin-left: 10px;">
                                 </div>
                                 
                                 <div id="topicDescribeContainer"></div>
                                 
                                 <script>
-                                    (function() {
-                                        function generateDescribeInputs() {
-                                            const countElement = document.getElementById('topicCountDescribe');
-                                            const container = document.getElementById('topicDescribeContainer');
-                                            
-                                            if (!countElement || !container) {
-                                                console.log('Describe elements not ready yet, retrying...');
-                                                setTimeout(generateDescribeInputs, 100);
-                                                return;
-                                            }
-                                            
-                                            const count = parseInt(countElement.value) || 1;
-                                            
-                                            let html = '';
-                                            for (let i = 1; i <= count; i++) {
-                                                html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #f0f8ff;">';
-                                                html += '<h4 style="margin: 0 0 15px 0; color: #1976d2; border-bottom: 1px solid #ddd; padding-bottom: 5px;">📋 Topic ' + i + ' to Describe</h4>';
-                                                html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
-                                                html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><br><input name="value" type="text" value="default-topic-' + i + '" style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
-                                                html += '</tr></table></div>';
-                                            }
-                                            container.innerHTML = html;
+                                    function generateDescribeInputs() {
+                                        const count = parseInt(document.getElementById('topicCountDescribe').value);
+                                        const container = document.getElementById('topicDescribeContainer');
+                                        
+                                        let html = '';
+                                        for (let i = 1; i <= count; i++) {
+                                            html += '<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fafafa;">';
+                                            html += '<h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Topic ' + i + ' to Describe</h4>';
+                                            html += '<table style="width: 100%; border-collapse: collapse;"><tr>';
+                                            html += '<td style="padding: 5px; vertical-align: top;"><label style="font-weight: bold;">Topic Name</label><input name="value" type="text" value="default-topic-' + i + '" style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; margin-top: 3px;"></td>';
+                                            html += '</tr></table></div>';
                                         }
-                                        
-                                        window.generateDescribeInputs = generateDescribeInputs;
-                                        
-                                        setTimeout(function() {
-                                            generateDescribeInputs();
-                                            
-                                            const countInput = document.getElementById('topicCountDescribe');
-                                            if (countInput) {
-                                                countInput.addEventListener('change', generateDescribeInputs);
-                                                countInput.addEventListener('input', generateDescribeInputs);
-                                            }
-                                        }, 200);
-                                    })();
+                                        container.innerHTML = html;
+                                    }
+                                    
+                                    // Initialize with one topic
+                                    generateDescribeInputs();
                                 </script>
                             """
                         } else if (TopicAction == 'MANAGE_TOPIC:ERROR') {
