@@ -146,9 +146,10 @@ properties([
                             }
                             return html
                         } else {
-                            return """ 
+                            def html =  """ 
                                 <label>This action didn't need any options.</label> 
                             """
+                            return html
                         }
                         '''
                 ]
