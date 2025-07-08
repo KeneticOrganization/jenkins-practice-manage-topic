@@ -150,7 +150,9 @@ pipeline {
                             "name": {"type": "string"},
                             "timestamp": {"type": "number"}
                         },
-                        "required": ["id", "name", "timestamp"]
+                        "required": [
+                            "id", "name", "timestamp"
+                        ]
                     }
                     """.replaceAll(/\s+/, ' ').trim()
                     
@@ -164,7 +166,7 @@ pipeline {
                     }
                     
                     // Escape the schema for JSON
-                    def escapedSchema = selectedSchema.replaceAll('"', '\\\\"')
+                    def escapedSchema = selectedSchema.replaceAll('"', '\\\\\"')
                     
                     echo """
 Subject Name : ${params.SubjectName}
