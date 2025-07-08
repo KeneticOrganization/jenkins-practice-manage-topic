@@ -370,7 +370,7 @@ Topic Name : ${values[0]}
                     }
                     steps{
                         script{
-                            def values = "${Option}"split(',').collect { it.trim() }.findAll { it }
+                            def values = "${Option}".split(',').collect { it.trim() }.findAll { it }
 
                             def countStr = "${Amount}".split(',').collect { it.trim() }.findAll { it }
                             def count = countStr[0].isInteger() ? countStr[0].toInteger() : 1
