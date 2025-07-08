@@ -66,6 +66,7 @@ pipeline {
     agent any
     environment {
         CC_SCHEMA_API_KEY = credentials('BASE64_SCHEMA_API_KEY')
+        CP_SCHEMA_API_KEY = credentials('CP_BASE64_SCHEMA_API_KEY')
     }
     stages {
         stage('Setup Environment') {
@@ -108,7 +109,7 @@ pipeline {
                         echo env.Auth
                     }
                     else if (env_params[1] == 'Platform,RestAPI' || props?.CONNECTION_TYPE == 'Platform,RestAPI'){
-                        env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_SCHEMA_API_KEY\""
+                        env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_SCHEMA_API_KEY\""
                     }
                     env.Command = "curl -s ${env.Auth} -X GET \"${env.REST_ENDPOINT}/subjects\""
                     if (env_params[1] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE == 'Platform,KafkaTools'){
