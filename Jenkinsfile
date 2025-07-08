@@ -112,14 +112,12 @@ properties([
                             return html
                         } else if (TopicAction == 'Update') {
                             def html = ""
-                            for (int i = 0; i < count; i++) {
-                                html += """
-                                    <div style="margin-bottom: 10px;">
-                                        <label for="option_${i}">Topic Name ${i + 1}:</label>
-                                        <input type="text" id="option_${i}" name="value" value="topic-${i + 1}" style="width: 300px;" />
-                                    </div>
-                                """
-                            }
+                            html += """
+                                <div style="margin-bottom: 10px;">
+                                    <label for="option_${i}">Topic Name ${i + 1}:</label>
+                                    <input type="text" id="option_${i}" name="value" value="topic-${i + 1}" style="width: 300px;" />
+                                </div>
+                            """
                             html += """
                                 <table><tr>
                                 <td><label>Cleanup Policy</label>
