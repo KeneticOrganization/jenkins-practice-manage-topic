@@ -70,7 +70,7 @@ pipeline {
         CP_API_KEY = credentials('CP_BASE64_API_KEY')
     }
     parameters {
-        string(name: 'TopicName', defaultValue: 'default-topic', description: 'String')
+        string(name: 'TopicName', defaultValue: 'default-topic', description: 'Topic names separated by comma (e.g., topic1,topic2,topic3)')
         choice(name: 'CleanupPolicy', choices: [
             'Compact', 'Delete'
             ], description: '')
@@ -123,7 +123,7 @@ pipeline {
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                     }
 
-                    // Update Topic Part
+                    // Store cleanup policy
                     def cleanPolicy = ""
                     if (params.CleanupPolicy == "Compact") {
                         cleanPolicy = "compact"
@@ -131,68 +131,100 @@ pipeline {
                     else if (params.CleanupPolicy == "Delete"){
                         cleanPolicy = "delete"
                     }
+                    env.CLEANUP_POLICY = cleanPolicy
+                    
+                    // Store connection type for later use
+                    env.CONNECTION_TYPE = env_params[2] ?: props?.CONNECTION_TYPE
+                    
                     echo """
-Topic Name : ${params.TopicName}
+Topic Names : ${params.TopicName}
 Cleanup Policy : ${cleanPolicy}
 Retention Time (ms) : ${params.RetentionTime}
 Retention Size (bytes) : ${params.RetentionSize}
 Max Message Bytes (bytes) : ${params.MaxMessageBytes}
                     """
-                    def updateJson = """{
-                        \\"${params.TopicName}\\": {
-                        \\"retention.ms\\": ${params.RetentionTime},
-                        \\"retention.bytes\\": ${params.RetentionSize},
-                        \\"max.message.bytes\\": ${params.MaxMessageBytes},
-                        \\"cleanup.policy\\": \\"${cleanPolicy}\\"
-                        }
-                    }"""
-
-                    env.HasTopic = "curl -s ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics\" | grep -c \"\\\"topic_name\\\":\\\"${params.TopicName}\\\"\""
-                    env.Command = """
-                    echo "${updateJson}" | jq -r 'to_entries[] | "\\(.key) \\(.value | to_entries[] )"' | while read topic data; do
-                                    property=\$(echo \$data | jq -r '.key')
-                                    valueJson=\$(echo \$data | jq -r '.value')
-                                    
-                                    curl -s ${env.Auth} -H 'Content-Type: application/json' --request PUT \\
-                                        --url "${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics/\$topic/configs/\$property" \\
-                                        -d "{\\\"value\\\": \\\"\$valueJson\\\"}"
-                    done
-                    """
-                    if (env_params[2] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE == 'Platform,KafkaTools'){
-                        env.Sort = ""
-                        env.HasTopic = "${env.KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${env.BOOTSTRAP_SERVER} --list --command-config ${env.KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq \"${params.TopicName}\""
-                        env.Command = """
-                        ${KAFKA_TOOLS_PATH}/bin/kafka-configs.sh --bootstrap-server ${BOOTSTRAP_SERVER} --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties \
-                                    --entity-type topics \
-                                    --entity-name ${params.TopicName} \
-                                    --alter \
-                                    --add-config cleanup.policy=${cleanPolicy},retention.ms=${params.RetentionTime},retention.bytes=${params.RetentionSize},max.message.bytes=${params.MaxMessageBytes}
-                        """
-                    }
                 }
             }
         }
-        stage('Update Topic'){
+        stage('Update Topics'){
             steps{
                 script{
-
-                    def updateResult = sh(
-                        script: """
-                            # First check if topic exists
-                            if ${env.HasTopic} ; then
-                                ${env.Command}
-                                
-                                echo "Successfully update topic '${params.TopicName}'"
-                            else
-                                echo "Topic '${params.TopicName}' not found. Cannot update."
-                            fi
-                        """,
-                        returnStdout: true
-                    ).trim()
+                    // Split topic names by comma and process each one
+                    def topicNames = params.TopicName.split(',').collect { it.trim() }.findAll { it }
+                    def allResults = []
                     
-                    echo "${updateResult}"
-                    writeFile file: 'update_result.txt', text: updateResult
+                    echo "Processing ${topicNames.size()} topic(s): ${topicNames.join(', ')}"
+                    
+                    for (topicName in topicNames) {
+                        echo "Processing topic: ${topicName}"
+                        
+                        // Create commands for current topic
+                        def hasTopicCommand = ""
+                        def updateCommand = ""
+                        
+                        if (env.CONNECTION_TYPE == 'Platform,KafkaTools') {
+                            hasTopicCommand = "${env.KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${env.BOOTSTRAP_SERVER} --list --command-config ${env.KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq \"${topicName}\""
+                            updateCommand = """
+                            ${env.KAFKA_TOOLS_PATH}/bin/kafka-configs.sh --bootstrap-server ${env.BOOTSTRAP_SERVER} --command-config ${env.KAFKA_TOOLS_PATH}/config/kafka-config.properties \
+                                        --entity-type topics \
+                                        --entity-name ${topicName} \
+                                        --alter \
+                                        --add-config cleanup.policy=${env.CLEANUP_POLICY},retention.ms=${params.RetentionTime},retention.bytes=${params.RetentionSize},max.message.bytes=${params.MaxMessageBytes}
+                            """
+                        } else {
+                            hasTopicCommand = "curl -s ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics\" | grep -c \"\\\"topic_name\\\":\\\"${topicName}\\\"\""
+                            
+                            def updateJson = """{
+                                \\"${topicName}\\": {
+                                \\"retention.ms\\": ${params.RetentionTime},
+                                \\"retention.bytes\\": ${params.RetentionSize},
+                                \\"max.message.bytes\\": ${params.MaxMessageBytes},
+                                \\"cleanup.policy\\": \\"${env.CLEANUP_POLICY}\\"
+                                }
+                            }"""
+                            
+                            updateCommand = """
+                            echo '${updateJson}' | jq -r 'to_entries[] | "\\(.key) \\(.value | to_entries[] )"' | while read topic data; do
+                                            property=\$(echo \$data | jq -r '.key')
+                                            valueJson=\$(echo \$data | jq -r '.value')
+                                            
+                                            curl -s ${env.Auth} -H 'Content-Type: application/json' --request PUT \\
+                                                --url "${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics/\$topic/configs/\$property" \\
+                                                -d "{\\\"value\\\": \\\"\$valueJson\\\"}"
+                            done
+                            """
+                        }
+                        
+                        // Execute update for current topic
+                        def updateResult = sh(
+                            script: """
+                                echo "=== Processing Topic: ${topicName} ==="
+                                
+                                # Check if topic exists
+                                if ${hasTopicCommand} ; then
+                                    echo "Topic '${topicName}' found. Updating configuration..."
+                                    ${updateCommand}
+                                    echo "Successfully updated topic '${topicName}'"
+                                else
+                                    echo "Topic '${topicName}' not found. Cannot update."
+                                fi
+                                echo "=== Finished processing Topic: ${topicName} ==="
+                                echo ""
+                            """,
+                            returnStdout: true
+                        ).trim()
+                        
+                        allResults.add(updateResult)
+                        echo "${updateResult}"
+                    }
+                    
+                    // Combine all results and save to file
+                    def combinedResults = allResults.join('\n')
+                    writeFile file: 'update_result.txt', text: combinedResults
                     archiveArtifacts artifacts: 'update_result.txt'
+                    
+                    echo "=== Summary ==="
+                    echo "Processed ${topicNames.size()} topic(s): ${topicNames.join(', ')}"
                 }
             }
         }
