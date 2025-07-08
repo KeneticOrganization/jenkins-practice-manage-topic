@@ -272,8 +272,10 @@ pipeline {
                     }
                     steps{
                         script{
-                            def option = "${Option}"
-                            def values = option.split(',').collect { it.trim() }.findAll { it }
+                            def values = "${Option}".split(',').collect { it.trim() }.findAll { it }
+
+                            def countStr = "${Amount}".split(',').collect { it.trim() }.findAll { it }
+                            def count = countStr[0].isInteger() ? countStr[0].toInteger() : 1
                             
                             //If count = 2 then 
                             // 0 is Topic Name
