@@ -166,7 +166,7 @@ pipeline {
                     }
                     
                     // Escape the schema for JSON
-                    def escapedSchema = selectedSchema.replaceAll('"', '\\\\\\\\""')
+                    def escapedSchema = selectedSchema.replaceAll('"', '\\\\\\\\\\"')
                     
                     echo """
 Subject Name : ${params.SubjectName}
