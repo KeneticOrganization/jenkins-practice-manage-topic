@@ -176,6 +176,8 @@ Schema Type : ${params.SchemaType}
 Compatibility Level : ${params.CompatibilityLevel}
 Schema Fields : ${schemaFields}
                     """
+
+                    echo escapedSchema
                     
                     env.HasSchema = "curl -s ${env.Auth} --request GET --url \"${env.SCHEMA_REGISTRY_URL}/subjects/${params.SubjectName}/versions\" | grep -c \"\\\"version\\\"\""
                     
