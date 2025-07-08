@@ -198,23 +198,17 @@ pipeline {
                         error "Number of topic names (${values.size()}) is less than expected (${count})"
                     }
 
-                    def confirmation = true
-                    for (int i = 0; i < count; i++) {
-                        def topicName = values[i]
-                        def CONFIRM_NAME = input(
-                            message: "Type the topic name to confirm deletion: '${topicName}'",
-                            parameters: [
-                                string(defaultValue: '', description: "Re-type '${topicName}' exactly to confirm", name: 'CONFIRM_NAME')
-                            ],
-                            ok: "Confirm",
-                            cancel: "Cancel"
-                        )
-
-                        if (CONFIRM_NAME != topicName) {
-                            confirmation = false
-                            break
-                        }
-                    }
+                    // Get the topics to be deleted
+                    def topicsToDelete = values.take(count)
+                    
+                    def confirmation = input(
+                        message: "Are you sure you want to delete the following ${count} topic(s)?\n${topicsToDelete.join('\n')}",
+                        parameters: [
+                            booleanParam(defaultValue: false, description: "Check to confirm deletion", name: 'CONFIRM_DELETE')
+                        ],
+                        ok: "Confirm",
+                        cancel: "Cancel"
+                    )
 
                     env.confirmation = confirmation
                 }
