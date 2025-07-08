@@ -274,28 +274,33 @@ pipeline {
                         script{
                             def option = "${Option}"
                             def values = option.split(',').collect { it.trim() }.findAll { it }
-                            if (values[2] == 'delete') {
-                                values[1] = "${values[1]},${values[2]}"
+                            
+                            //If count = 2 then 
+                            // 0 is Topic Name
+                            // 1 is Topic Name
+                            // 2 is CleanupPolicy
+                            // 3 is RetentionTime
+                            // 4 is RetentionSize
+                            // 5 is MaxMessageBytes
+
+                            if (values[count+1] == 'delete') {
+                                values[count] = "${values[1]},${values[2]}"
                                 
-                                values[2] = values[3]
-                                values[3] = values[4]
-                                values[4] = values[5]
+                                values[count] = values[count+1]
+                                values[count+1] = values[count+2]
+                                values[count+2] = values[count+3]
                                 
-                                values = values.take(5)
+                                values = values.take(count+3)
                             }
-                            echo """
-Topic Name : ${values[0]}
-Cleanup Policy : ${values[1]}
-Retention Time (ms) : ${values[2]}
-Retention Size (bytes) : ${values[3]}
-Max Message Bytes (bytes) : ${values[4]}
-                            """
-                            def updateResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/update-topic', parameters: [
-                                string(name: 'TopicName', value: "${values[0]}"), 
-                                string(name: 'CleanupPolicy', value: "${values[1]}"), 
-                                string(name: 'RetentionTime', value: "${values[2]}"), 
-                                string(name: 'RetentionSize', value: "${values[3]}"), 
-                                string(name: 'MaxMessageBytes', value: "${values[4]}"),
+
+                            def multipleTopicName = values[0..(count-1)].join(',')
+
+                            def updateResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/update-topic-multiple', parameters: [
+                                string(name: 'TopicName', value: "${multipleTopicName}"), 
+                                string(name: 'CleanupPolicy', value: "${values[count]}"), 
+                                string(name: 'RetentionTime', value: "${values[count+1]}"), 
+                                string(name: 'RetentionSize', value: "${values[count+2]}"), 
+                                string(name: 'MaxMessageBytes', value: "${values[count+3]}"),
                                 string(name: 'ParamsAsENV', value: 'true,'),
                                 string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
                             ]
