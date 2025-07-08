@@ -103,19 +103,15 @@ pipeline {
                         }
                     }
                     env.Auth = ""
-                    env.Sort = "| jq '.data"
                     if(env_params[1] == 'Cloud' || props?.CONNECTION_TYPE == 'Cloud'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_SCHEMA_API_KEY\""
                         echo env.Auth
                     }
                     else if (env_params[1] == 'Platform,RestAPI' || props?.CONNECTION_TYPE == 'Platform,RestAPI'){
-                        env.Sort = env.Sort + " | map(select(.topic_name | startswith(\"_\") | not))"
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_SCHEMA_API_KEY\""
                     }
-                    env.Sort = env.Sort + "'"
                     env.Command = "curl -s ${env.Auth} -X GET \"${env.REST_ENDPOINT}/subjects\""
                     if (env_params[1] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE == 'Platform,KafkaTools'){
-                        env.Sort = "| grep -v '^_'"
                         env.Command = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties"
                     }
                 }
@@ -127,7 +123,7 @@ pipeline {
                     def listResult = sh(
                         script: """
                             RESPONSE=\$(${env.Command})
-                            echo "\$RESPONSE" ${env.Sort}
+                            echo "\$RESPONSE"
                         """,
                         returnStdout: true
                     ).trim()
