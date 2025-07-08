@@ -201,16 +201,13 @@ pipeline {
                     // Get the topics to be deleted
                     def topicsToDelete = values.take(count)
                     
-                    def confirmation = input(
+                    input(
                         message: "Are you sure you want to delete the following ${count} topic(s)?\n${topicsToDelete.join('\n')}",
-                        parameters: [
-                            booleanParam(defaultValue: false, description: "Check to confirm deletion", name: 'CONFIRM_DELETE')
-                        ],
                         ok: "Confirm",
                         cancel: "Cancel"
                     )
 
-                    env.confirmation = confirmation
+                    env.confirmation = true
                 }
             }
         }
