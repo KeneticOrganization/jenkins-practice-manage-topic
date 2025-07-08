@@ -105,7 +105,6 @@ pipeline {
                     env.Auth = ""
                     env.Sort = "| jq '.data"
                     if(env_params[1] == 'Cloud' || props?.CONNECTION_TYPE == 'Cloud'){
-                        env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_SCHEMA_API_KEY\""
                         echo env.Auth
                     }
