@@ -104,7 +104,7 @@ pipeline {
                         }
                     }
                     env.Auth = ""
-                    env.Sort = "| jq -r '.schema' | jq ."
+                    env.Sort = ""
 
                     echo params.SchemaVersion?.toLowerCase()
 
