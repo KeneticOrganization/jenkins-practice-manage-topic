@@ -125,7 +125,7 @@ pipeline {
                     def listResult = sh(
                         script: """
                             RESPONSE=\$(${env.Command})
-                            echo "\$RESPONSE ${env.Sort}"
+                            echo "\$RESPONSE" ${env.Sort}
                         """,
                         returnStdout: true
                     ).trim()
