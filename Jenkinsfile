@@ -69,7 +69,6 @@ pipeline {
         CP_API_KEY = credentials('CP_BASE64_SCHEMA_API_KEY')
     }
     parameters {
-        string(name: 'SchemaID', defaultValue: '100003', description: 'Integer')
         string(name: 'SchemaVersion', defaultValue: 'latest', description: 'Schema Version (e.g., 1, 2, or latest)')
         string(name: 'Subject', defaultValue: 'default-subject', description: 'Schema Subject (required for versioned request)')
     }
@@ -112,7 +111,7 @@ pipeline {
                     else if (env_params[2] == 'Platform,RestAPI' || props?.CONNECTION_TYPE == 'Platform,RestAPI'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                     }
-                    env.HasTopic = "curl -s ${env.Auth} -H \"Content-Type: application/vnd.schemaregistry.v1+json\" --request DELETE --url \"${env.SCHEMA_REGISTRY_URL}/subjects?subjectPrefix=${params.Subject}\" | grep -c \"\\\"version\\\":${params.SchemaVersion}\""
+                    env.HasTopic = "curl -s ${env.Auth} -H \"Content-Type: application/vnd.schemaregistry.v1+json\" --request GET --url \"${env.SCHEMA_REGISTRY_URL}/subjects?subjectPrefix=${params.Subject}\" | grep -c \"\\\"version\\\":${params.SchemaVersion}\""
                     if (params.SchemaVersion?.trim() && params.SchemaVersion?.toLowerCase() == 'all') {
                         // Delete all version
                         env.Command = "curl -s ${env.Auth} -H \"Content-Type: application/vnd.schemaregistry.v1+json\" --request DELETE --url \"${env.SCHEMA_REGISTRY_URL}/subjects/${params.Subject}\""
