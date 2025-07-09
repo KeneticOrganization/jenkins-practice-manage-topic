@@ -105,6 +105,9 @@ pipeline {
                     }
                     env.Auth = ""
                     env.Sort = "| jq -r '.schema' | jq ."
+
+                    echo params.SchemaVersion?.toLowerCase()
+                    
                     if(env_params[2] == 'Cloud' || props?.CONNECTION_TYPE == 'Cloud'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_API_KEY\""
                     }
