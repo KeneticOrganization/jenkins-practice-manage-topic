@@ -115,7 +115,7 @@ pipeline {
                     else if (env_params[2] == 'Platform,RestAPI' || props?.CONNECTION_TYPE == 'Platform,RestAPI'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                     }
-                    env.HasTopic = "curl ${env.Auth} --request GET \"${env.SCHEMA_REGISTRY_URL}/schemas\" | grep -c \"\\\"id\\\":${params.SchemaID}\""
+                    env.HasTopic = "curl -s ${env.Auth} --request GET \"${env.SCHEMA_REGISTRY_URL}/schemas\" | grep -c \"\\\"id\\\":${params.SchemaID}\""
                     env.Command = "curl -s ${env.Auth} --request GET \"${env.SCHEMA_REGISTRY_URL}/schemas/ids/${params.SchemaID}\""
                     if (env_params[2] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE == 'Platform,KafkaTools'){
                         env.Sort = ""
@@ -139,6 +139,8 @@ pipeline {
                         """,
                         returnStdout: true
                     ).trim()
+
+                    echo describeResult
                     
                     writeFile file: 'describe_result.txt', text: describeResult
                     archiveArtifacts artifacts: 'describe_result.txt'
