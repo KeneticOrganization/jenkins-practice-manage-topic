@@ -12,7 +12,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return['LIST_TOPIC:ERROR']'''
+                        '''return['LIST_SCHEMA:ERROR']'''
                 ], 
                 script: [
                     classpath: [], 
@@ -35,7 +35,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return['LIST_TOPIC:ERROR']'''
+                        '''return['LIST_SCHEMA:ERROR']'''
                 ], 
                 script: [
                     classpath: [], 
@@ -119,7 +119,7 @@ pipeline {
                 }
             }
         }
-        stage('List Topic'){
+        stage('List Schema'){
             steps{
                 script{
                     def listResult = sh(
