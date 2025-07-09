@@ -112,13 +112,13 @@ pipeline {
                     else if (env_params[2] == 'Platform,RestAPI' || props?.CONNECTION_TYPE == 'Platform,RestAPI'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                     }
-                    env.HasTopic = "curl -s ${env.Auth} --request GET --url \"${env.SCHEMA_REGISTRY_URL}/schemas\" | grep -c \"\\\"id\\\":${params.SchemaID}\""
-                    if (params.SchemaVersion?.trim() && params.SchemaVersion != 'latest') {
-                        // Use specific version (e.g., 1, 2, etc.)
-                        env.Command = "curl -s ${env.Auth} --request GET --url \"${env.SCHEMA_REGISTRY_URL}/subjects/${params.Subject}/versions/${params.SchemaVersion}\""
+                    env.HasTopic = "curl -s ${env.Auth} -H \"Content-Type: application/vnd.schemaregistry.v1+json\" --request DELETE --url \"${env.SCHEMA_REGISTRY_URL}/subjects?subjectPrefix=${params.Subject}\" | grep -c \"\\\"version\\\":${params.SchemaVersion}\""
+                    if (params.SchemaVersion?.trim() && params.SchemaVersion?.toLowerCase() == 'all') {
+                        // Delete all version
+                        env.Command = "curl -s ${env.Auth} -H \"Content-Type: application/vnd.schemaregistry.v1+json\" --request DELETE --url \"${env.SCHEMA_REGISTRY_URL}/subjects/${params.Subject}\""
                     } else {
-                        // Use latest version
-                        env.Command = "curl -s ${env.Auth} --request GET --url \"${env.SCHEMA_REGISTRY_URL}/schemas/ids/${params.SchemaID}\""
+                        // Delete specific version (e.g., 1, 2, etc.)
+                        env.Command = "curl -s ${env.Auth} -H \"Content-Type: application/vnd.schemaregistry.v1+json\" --request DELETE --url \"${env.SCHEMA_REGISTRY_URL}/subjects/${params.Subject}/versions/${params.SchemaVersion}\""
                     }
                     if (env_params[2] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE == 'Platform,KafkaTools'){
                         env.Sort = ""
@@ -128,25 +128,25 @@ pipeline {
                 }
             }
         }
-        stage('Get Schema'){
+        stage('Delete Schema'){
             steps{
                 script{
-                    def getSchemaResult = sh(
+                    def deleteSchemaResult = sh(
                             script:"""
                             if ${env.HasTopic} ; then
                                 RESPONSE=\$(${env.Command})
                                 echo "\$RESPONSE" ${env.Sort}
                             else
-                                echo "Unknown Schema ID \"${params.SchemaID}\"."
+                                echo "Unknown Schema subjects \"${params.Subject}\"."
                             fi
                         """,
                         returnStdout: true
                     ).trim()
 
-                    echo getSchemaResult
+                    echo deleteSchemaResult
                     
-                    writeFile file: 'get_schema_result.txt', text: getSchemaResult
-                    archiveArtifacts artifacts: 'get_schema_result.txt'
+                    writeFile file: 'delete_schema_result.txt', text: deleteSchemaResult
+                    archiveArtifacts artifacts: 'delete_schema_result.txt'
                 }
             }
         }
