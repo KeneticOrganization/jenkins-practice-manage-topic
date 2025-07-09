@@ -70,7 +70,7 @@ pipeline {
         CP_API_KEY = credentials('CP_BASE64_API_KEY')
     }
     parameters {
-        string(name: 'SchemaID', defaultValue: '100004', description: 'Integer')
+        string(name: 'SchemaID', defaultValue: '100003', description: 'Integer')
     }
     stages {
         stage('Setup Environment') {
@@ -134,7 +134,7 @@ pipeline {
                                 RESPONSE=\$(${env.Command})
                                 echo "\$RESPONSE" ${env.Sort}
                             else
-                                echo "Unknown topic \"${params.TopicName}\"."
+                                echo "Unknown Schema ID \"${params.SchemaID}\"."
                             fi
                         """,
                         returnStdout: true
