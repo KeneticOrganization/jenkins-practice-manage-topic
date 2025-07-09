@@ -69,7 +69,7 @@ pipeline {
         CP_API_KEY = credentials('CP_BASE64_SCHEMA_API_KEY')
     }
     parameters {
-        string(name: 'SchemaVersion', defaultValue: 'latest', description: 'Schema Version (e.g., 1, 2, or latest)')
+        string(name: 'SchemaVersion', defaultValue: 'all', description: 'Schema Version (e.g., 1, 2, or latest)')
         string(name: 'Subject', defaultValue: 'default-subject', description: 'Schema Subject (required for versioned request)')
     }
     stages {
