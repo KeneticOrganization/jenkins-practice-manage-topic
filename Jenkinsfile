@@ -118,7 +118,7 @@ pipeline {
                         env.Command = "curl -s ${env.Auth} --request GET --url \"${env.SCHEMA_REGISTRY_URL}/subjects/${params.Subject}/versions/${params.SchemaVersion}\""
                     } else {
                         // Use latest version
-                        env.Command = "curl -s ${env.Auth} --request GET --url \"${env.SCHEMA_REGISTRY_URL}/schemas/${params.SchemaID}\""
+                        env.Command = "curl -s ${env.Auth} --request GET --url \"${env.SCHEMA_REGISTRY_URL}/schemas/ids/${params.SchemaID}\""
                     }
                     if (env_params[2] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE == 'Platform,KafkaTools'){
                         env.Sort = ""
