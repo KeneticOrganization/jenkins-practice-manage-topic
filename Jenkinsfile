@@ -66,8 +66,8 @@ properties([
 pipeline {
     agent any
     environment {
-        CC_API_KEY = credentials('BASE64_API_KEY')
-        CP_API_KEY = credentials('CP_BASE64_API_KEY')
+        CC_API_KEY = credentials('BASE64_SCHEMA_API_KEY')
+        CP_API_KEY = credentials('CP_BASE64_SCHEMA_API_KEY')
     }
     parameters {
         string(name: 'SchemaID', defaultValue: '100003', description: 'Integer')
