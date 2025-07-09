@@ -12,7 +12,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return['DESCRIBE_TOPIC:ERROR']'''
+                        '''return['GET_SCHEMA:ERROR']'''
                 ], 
                 script: [
                     classpath: [], 
@@ -35,7 +35,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return['DESCRIBE_TOPIC:ERROR']'''
+                        '''return['GET_SCHEMA:ERROR']'''
                 ], 
                 script: [
                     classpath: [], 
@@ -45,8 +45,7 @@ properties([
                         if (ParamsAsENV == 'true'){
                             return """
                                 <table><tr>
-                                <td><label>Rest API Endpoint : </label><input name='value' type='text' value=''></td>
-                                <td><label>Cluster ID : </label><input name='value' type='text' value=''></td>
+                                <td><label>SchemaID : </label><input name='value' type='text' value=''></td>
                                 <td><label>Connection Type : </label>
                                 <select name='value'>
                                     <option value='Cloud'>Confluent Cloud</option>
@@ -85,28 +84,24 @@ pipeline {
                     if (UseParamsAsENV[0] != 'true') {
                         props = readProperties file: 'env.properties'
                     }
-                    else if (env_params[2] != 'Cloud'){
+                    else if (env_params[1] != 'Cloud'){
                         env_params[0] = env_params[0].replaceAll(";", ",")
-                        env_params[2] = env_params[2].replaceAll(";", ",")
+                        env_params[1] = env_params[1].replaceAll(";", ",")
                     }
 
                     if (UseParamsAsENV[0] == 'true'){
-                        if (env_params[2] == 'Platform,KafkaTools') {
+                        if (env_params[1] == 'Platform,KafkaTools') {
                             env.SCHEMA_REGISTRY_URL = env_params[0]
-                            env.KAFKA_TOOLS_PATH = env_params[1]
                         }
                         else {
                             env.SCHEMA_REGISTRY_URL = env_params[0]
-                            env.CLUSTER_ID = env_params[1]
                         }
                     } else  {
                         if (props.CONNECTION_TYPE == 'Platform,KafkaTools') {
                             env.SCHEMA_REGISTRY_URL = props.SCHEMA_REGISTRY_URL
-                            env.KAFKA_TOOLS_PATH = props.KAFKA_TOOLS_PATH
                         }
                         else {
                             env.SCHEMA_REGISTRY_URL = props.SCHEMA_REGISTRY_URL
-                            env.CLUSTER_ID = props.CLUSTER_ID
                         }
                     }
                     env.Auth = ""
