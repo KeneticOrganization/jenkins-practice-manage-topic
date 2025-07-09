@@ -70,7 +70,7 @@ pipeline {
         CP_API_KEY = credentials('CP_BASE64_API_KEY')
     }
     parameters {
-        string(name: 'TopicName', defaultValue: 'default-topic', description: 'String')
+        string(name: 'SchemaID', defaultValue: 'default-topic', description: 'String')
     }
     stages {
         stage('Setup Environment') {
@@ -94,7 +94,7 @@ pipeline {
                             env.KAFKA_TOOLS_PATH = env_params[1]
                         }
                         else {
-                            env.REST_ENDPOINT = env_params[0]
+                            env.SCHEMA_REGISTRY_URL = env_params[0]
                             env.CLUSTER_ID = env_params[1]
                         }
                     } else  {
@@ -103,25 +103,24 @@ pipeline {
                             env.KAFKA_TOOLS_PATH = props.KAFKA_TOOLS_PATH
                         }
                         else {
-                            env.REST_ENDPOINT = props.REST_ENDPOINT
+                            env.SCHEMA_REGISTRY_URL = props.SCHEMA_REGISTRY_URL
                             env.CLUSTER_ID = props.CLUSTER_ID
                         }
                     }
                     env.Auth = ""
                     env.Sort = "| jq '.'"
                     if(env_params[2] == 'Cloud' || props?.CONNECTION_TYPE == 'Cloud'){
-                        env.REST_ENDPOINT = env.REST_ENDPOINT + '/kafka'
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_API_KEY\""
                     }
                     else if (env_params[2] == 'Platform,RestAPI' || props?.CONNECTION_TYPE == 'Platform,RestAPI'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                     }
-                    env.HasTopic = "curl -s ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics\" | grep -c \"\\\"topic_name\\\":\\\"${params.TopicName}\\\"\""
-                    env.Command = "curl ${env.Auth} --request GET --url \"${env.REST_ENDPOINT}/v3/clusters/${env.CLUSTER_ID}/topics/${params.TopicName}\""
+                    env.HasTopic = "curl -s ${env.Auth} --request GET \"${env.REST_ENDPOINT}/schemas\" | grep -c \"\\\"id\\\":\\\"${params.SchemaID}\\\"\""
+                    env.Command = "curl -s ${env.Auth} --request GET \"${env.REST_ENDPOINT}/schemas/ids/${params.SchemaID}\""
                     if (env_params[2] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE == 'Platform,KafkaTools'){
                         env.Sort = ""
                         env.HasTopic = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq \"${params.TopicName}\""
-                        env.Command = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --describe --topic ${params.TopicName} --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties"
+                        env.Command = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --describe --topic ${params.SchemaID} --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties"
                     }
                 }
             }
