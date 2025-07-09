@@ -71,6 +71,8 @@ pipeline {
     }
     parameters {
         string(name: 'SchemaID', defaultValue: '100003', description: 'Integer')
+        string(name: 'SchemaVersion', defaultValue: 'latest', description: 'Schema Version (e.g., 1, 2, or latest)')
+        string(name: 'Subject', defaultValue: 'default-subject', description: 'Schema Subject (required for versioned request)')
     }
     stages {
         stage('Setup Environment') {
@@ -115,8 +117,14 @@ pipeline {
                     else if (env_params[2] == 'Platform,RestAPI' || props?.CONNECTION_TYPE == 'Platform,RestAPI'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                     }
-                    env.HasTopic = "curl -s ${env.Auth} --request GET \"${env.SCHEMA_REGISTRY_URL}/schemas\" | grep -c \"\\\"id\\\":${params.SchemaID}\""
-                    env.Command = "curl -s ${env.Auth} --request GET \"${env.SCHEMA_REGISTRY_URL}/schemas/ids/${params.SchemaID}\""
+                    env.HasTopic = "curl -s ${env.Auth} --request GET --url \"${env.SCHEMA_REGISTRY_URL}/schemas\" | grep -c \"\\\"id\\\":${params.SchemaID}\""
+                    if (params.SchemaVersion?.trim() && params.SchemaVersion != 'latest') {
+                        // Use specific version (e.g., 1, 2, etc.)
+                        env.Command = "curl -s ${env.Auth} --request GET --url \"${env.SCHEMA_REGISTRY_URL}/subjects/${params.Subject}/versions/${params.SchemaVersion}\""
+                    } else {
+                        // Use latest version
+                        env.Command = "curl -s ${env.Auth} --request GET --url \"${env.SCHEMA_REGISTRY_URL}/subjects/${params.Subject}/versions/latest\""
+                    }
                     if (env_params[2] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE == 'Platform,KafkaTools'){
                         env.Sort = ""
                         env.HasTopic = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq \"${params.TopicName}\""
