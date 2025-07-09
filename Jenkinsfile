@@ -221,7 +221,7 @@ Schema Fields : ${schemaFields}
                         script: """
                             echo "Checking if schema exists for subject: ${params.SubjectName}"
                             
-                            if ! ${env.HasSchema} >/dev/null 2>&1; then
+                            if ! ${env.HasSchema}; then
                                 echo "Setting compatibility level to ${params.CompatibilityLevel}"
                                 ${env.SetCompatibilityCommand}
                                 
