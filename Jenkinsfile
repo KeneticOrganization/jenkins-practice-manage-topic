@@ -133,10 +133,10 @@ pipeline {
                 }
             }
         }
-        stage('Describe Topic'){
+        stage('Get Schema'){
             steps{
                 script{
-                    def describeResult = sh(
+                    def getSchemaResult = sh(
                             script:"""
                             if ${env.HasTopic} ; then
                                 RESPONSE=\$(${env.Command})
@@ -148,10 +148,10 @@ pipeline {
                         returnStdout: true
                     ).trim()
 
-                    echo describeResult
+                    echo getSchemaResult
                     
-                    writeFile file: 'describe_result.txt', text: describeResult
-                    archiveArtifacts artifacts: 'describe_result.txt'
+                    writeFile file: 'get_schema_result.txt', text: getSchemaResult
+                    archiveArtifacts artifacts: 'get_schema_result.txt'
                 }
             }
         }
