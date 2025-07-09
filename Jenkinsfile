@@ -90,7 +90,7 @@ pipeline {
 
                     if (UseParamsAsENV[0] == 'true'){
                         if (env_params[2] == 'Platform,KafkaTools') {
-                            env.BOOTSTRAP_SERVER = env_params[0]
+                            env.SCHEMA_REGISTRY_URL = env_params[0]
                             env.KAFKA_TOOLS_PATH = env_params[1]
                         }
                         else {
@@ -99,7 +99,7 @@ pipeline {
                         }
                     } else  {
                         if (props.CONNECTION_TYPE == 'Platform,KafkaTools') {
-                            env.BOOTSTRAP_SERVER = props.BOOTSTRAP_SERVER
+                            env.SCHEMA_REGISTRY_URL = props.SCHEMA_REGISTRY_URL
                             env.KAFKA_TOOLS_PATH = props.KAFKA_TOOLS_PATH
                         }
                         else {
