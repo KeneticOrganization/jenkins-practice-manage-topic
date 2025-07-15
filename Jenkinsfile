@@ -22,7 +22,7 @@ pipeline {
         stage('Creating Schema Testing'){
             steps{
                 script{
-                    def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-topic-Jenkins', parameters: [
+                    def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-schema', parameters: [
                         string(name: 'SubjectName', value: 'test-subject'), 
                         string(name: 'SchemaName', value: 'DefaultRecord'), 
                         string(name: 'SchemaNamespace', value: 'com.test'), 
@@ -37,13 +37,13 @@ pipeline {
                         string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                     ]
 
-                    copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'create_result.txt')
+                    copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'schema_create_result.txt')
 
-                    def output = readFile('create_result.txt').trim()
+                    def output = readFile('schema_create_result.txt').trim()
                     echo "Creating output: ${output}"
                     
-                    // Generate JUnit XML for create topic test
-                    generateJUnitXML('create-topic-test', output.contains('Success') || output.contains('created'), 'Create Topic Test', output)
+                    // Generate JUnit XML for create schema test
+                    generateJUnitXML('create-schema-test', output.contains('Success') || output.contains('created'), 'Create Schema Test', output)
                 }
             }
         }
@@ -51,9 +51,9 @@ pipeline {
         stage('List Schema Testing'){
             steps{
                 script{
-                    def listResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/list-topic', parameters: [
+                    def listResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/list-schema', parameters: [
                         string(name: 'ParamsAsENV', value: 'true,'),
-                        string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
+                        string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                     ]
 
                     copyArtifacts(projectName: listResult.projectName, selector: specific("${listResult.number}"), filter: 'list_result.txt')
@@ -61,8 +61,8 @@ pipeline {
                     def output = readFile('list_result.txt').trim()
                     echo "List output: ${output}"
                     
-                    // Generate JUnit XML for list topic test
-                    generateJUnitXML('list-topic-test', output.contains('test-topic'), 'List Topic Test', output)
+                    // Generate JUnit XML for list schema test
+                    generateJUnitXML('list-schema-test', output.contains('test-topic'), 'List Schema Test', output)
                 }
             }
         }
@@ -70,7 +70,7 @@ pipeline {
         stage('Get Schema Testing'){
             steps{
                 script{
-                    def describeResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/describe-topic', parameters: [
+                    def describeResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/get-schema', parameters: [
                         string(name: 'TopicName', value: 'test-topic'),
                         string(name: 'ParamsAsENV', value: 'true,'),
                         string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
@@ -90,7 +90,7 @@ pipeline {
         stage('Update Schema Testing'){
             steps{
                 script{
-                    def updateResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/update-topic', parameters: [
+                    def updateResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-schema', parameters: [
                         string(name: 'TopicName', value: 'test-topic'), 
                         string(name: 'CleanupPolicy', value: 'Delete'), 
                         string(name: 'RetentionTime', value: '259200000'), 
@@ -114,7 +114,7 @@ pipeline {
         stage('Delete Schema Testing'){
             steps{
                 script{
-                    def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-topic', parameters: [
+                    def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-schema', parameters: [
                         string(name: 'TopicName', value: 'test-topic'),
                         string(name: 'ParamsAsENV', value: 'true,'),
                         string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
