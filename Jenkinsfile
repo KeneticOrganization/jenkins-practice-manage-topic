@@ -12,13 +12,13 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return['MANAGE_TOPIC:ERROR']'''
+                        '''return['MANAGE_SCHEMA:ERROR']'''
                 ], 
                 script: [
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return["Create","Update","Describe","List:selected","Delete"]'''
+                        '''return["Create","Update","Get","List:selected","Delete"]'''
                 ]
             ]
         ], 
@@ -34,7 +34,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return['MANAGE_TOPIC:ERROR']'''
+                        '''return['MANAGE_SCHEMA:ERROR']'''
                 ], 
                 $class: 'GroovyScript', 
                 script: [
@@ -43,44 +43,67 @@ properties([
                     script: 
                         '''
                         if (Action == 'List'){
-                            return "<label>This action didn't need any opions.</label>"
+                            return "<label>This action didn't need any options.</label>"
                         } else if (Action == 'Create') {
                             return """
                                 <table><tr>
                                 <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="width: 300px; height: auto; border: 2px solid #555; border-radius: 10px;">
-                                <td><label>Topic Name</label><input name='value' type='text' value='default-topic'></td>
-                                <td><label>Partitions</label><input name='value' type='number' value='6'></td>
-                                <td><label>Cleanup Policy</label>
+                                <td><label>Subject Name</label><input name='value' type='text' value='test-subject'></td>
+                                <td><label>Schema Name</label><input name='value' type='text' value='DefaultRecord'></td>
+                                <td><label>Schema Namespace</label><input name='value' type='text' value='com.test'></td>
+                                <td><label>Schema Fields</label><textarea name='value' rows='5' cols='50'>[
+    {"name": "id", "type": "string"},
+    {"name": "name", "type": "string"},
+    {"name": "timestamp", "type": "long"}
+]</textarea></td>
+                                <td><label>Compatibility Level</label>
                                 <select name='value'>
-                                    <option value='Compact'>Compact</option>
-                                    <option value='Compact & Delete'>Compact & Delete</option>
-                                    <option value='Delete' selected>Delete</option>
+                                    <option value='BACKWARD' selected>BACKWARD</option>
+                                    <option value='FORWARD'>FORWARD</option>
+                                    <option value='FULL'>FULL</option>
+                                    <option value='NONE'>NONE</option>
                                 </select></td>
-                                <td><label>Retention Time (ms)</label><input name='value' type='number' value='604800000'></td>
-                                <td><label>Retention Size (bytes)</label><input name='value' type='number' value='-1'></td>
-                                <td><label>Max Message Bytes (bytes)</label><input name='value' type='number' value='2097164'></td>
+                                <td><label>Schema Type</label>
+                                <select name='value'>
+                                    <option value='AVRO' selected>AVRO</option>
+                                    <option value='JSON'>JSON</option>
+                                    <option value='PROTOBUF'>PROTOBUF</option>
+                                </select></td>
                                 </tr></table>
                             """
                         } else if (Action == 'Update') {
                             return """
                                 <table><tr>
-                                <td><label>Topic Name</label><input name='value' type='text' value='default-topic'></td>
-                                <td><label>Cleanup Policy</label>
+                                <td><label>Subject Name</label><input name='value' type='text' value='test-subject'></td>
+                                <td><label>Schema Name</label><input name='value' type='text' value='DefaultRecord'></td>
+                                <td><label>Schema Namespace</label><input name='value' type='text' value='com.test'></td>
+                                <td><label>Schema Fields</label><textarea name='value' rows='5' cols='50'>[
+    {"name": "id", "type": "string"},
+    {"name": "name", "type": "string"},
+    {"name": "timestamp", "type": "long"},
+    {"name": "value", "type": "int", "default": 0}
+]</textarea></td>
+                                <td><label>Compatibility Level</label>
                                 <select name='value'>
-                                    <option value='Compact'>Compact</option>
-                                    <option value='Delete' selected>Delete</option>
+                                    <option value='BACKWARD' selected>BACKWARD</option>
+                                    <option value='FORWARD'>FORWARD</option>
+                                    <option value='FULL'>FULL</option>
+                                    <option value='NONE'>NONE</option>
                                 </select></td>
-                                <td><label>Retention Time (ms)</label><input name='value' type='number' value='604800000'></td>
-                                <td><label>Retention Size (bytes)</label><input name='value' type='number' value='-1'></td>
-                                <td><label>Max Message Bytes (bytes)</label><input name='value' type='number' value='2097164'></td>
+                                <td><label>Schema Type</label>
+                                <select name='value'>
+                                    <option value='AVRO' selected>AVRO</option>
+                                    <option value='JSON'>JSON</option>
+                                    <option value='PROTOBUF'>PROTOBUF</option>
+                                </select></td>
                                 </tr></table>
                             """
-                        } else if (Action == 'MANAGE_TOPIC:ERROR') {
-                            return['MANAGE_TOPIC:ERROR']
+                        } else if (Action == 'MANAGE_SCHEMA:ERROR') {
+                            return['MANAGE_SCHEMA:ERROR']
                         } else {
                             return """
                                 <table><tr>
-                                <td><label>Topic Name : </label><input name='value' type='text' value='default-topic'></td>
+                                <td><label>Subject Name : </label><input name='value' type='text' value='test-subject'></td>
                                 </tr></table>
                             """
                         }
@@ -101,12 +124,10 @@ pipeline {
                 script{
                     def props = readProperties file: 'env.properties'
                     if(props.CONNECTION_TYPE == 'Platform,KafkaTools'){
-                        env.params_1 = props.BOOTSTRAP_SERVER.replaceAll(",", ";")
-                        env.params_2 = props.KAFKA_TOOLS_PATH
+                        env.params_1 = props.SCHEMA_REGISTRY_URL.replaceAll(",", ";")
                     }
                     else{
-                        env.params_1 = props.REST_ENDPOINT
-                        env.params_2 = props.CLUSTER_ID
+                        env.params_1 = props.SCHEMA_REGISTRY_URL
                     }
                     env.CONNECTION_TYPE = props.CONNECTION_TYPE.replaceAll(",", ";")
                 }
@@ -123,9 +144,9 @@ pipeline {
                     def values = option.split(',').collect { it.trim() }.findAll { it }
                     
                     def CONFIRM_NAME = input(
-                        message: "Type the topic name to confirm deletion: '${values[0]}'",
+                        message: "Type the subject name to confirm deletion: '${values[0]}'",
                         parameters: [
-                            string(defaultValue: '', description: 'Re-type the topic name exactly to confirm', name: 'CONFIRM_NAME')
+                            string(defaultValue: '', description: 'Re-type the subject name exactly to confirm', name: 'CONFIRM_NAME')
                         ],
                         ok: "Confirm",
                         cancel: "Cancel"
@@ -141,7 +162,7 @@ pipeline {
                 }
             }
         }
-        stage('Topic') {
+        stage('Schema Management') {
             parallel{
                 stage('Create'){
                     when{
@@ -151,40 +172,33 @@ pipeline {
                         script{
                             def option = "${Option}"
                             def values = option.split(',').collect { it.trim() }.findAll { it }
-                            if (values[3] == 'delete') {
-                                values[2] = "${values[2]},${values[3]}"
-                                
-                                values[3] = values[4]
-                                values[4] = values[5]
-                                values[5] = values[6]
-                                
-                                values = values.take(6)
-                            }
+                            
                             echo """
-Topic Name : ${values[0]}
-Partition : ${values[1]}
-Cleanup Policy : ${values[2]}
-Retention Time (ms) : ${values[3]}
-Retention Size (bytes) : ${values[4]}
-Max Message Bytes (bytes) : ${values[5]}
+Subject Name : ${values[0]}
+Schema Name : ${values[1]}
+Schema Namespace : ${values[2]}
+Schema Fields : ${values[3]}
+Compatibility Level : ${values[4]}
+Schema Type : ${values[5]}
                             """
-                            def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-topic-Jenkins', parameters: [
-                                string(name: 'TopicName', value: "${values[0]}"), 
-                                string(name: 'Partitions', value: "${values[1]}"), 
-                                string(name: 'CleanupPolicy', value: "${values[2]}"), 
-                                string(name: 'RetentionTime', value: "${values[3]}"), 
-                                string(name: 'RetentionSize', value: "${values[4]}"), 
-                                string(name: 'MaxMessageBytes', value: "${values[5]}"),
+                            
+                            def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-schema', parameters: [
+                                string(name: 'SubjectName', value: "${values[0]}"), 
+                                string(name: 'SchemaName', value: "${values[1]}"), 
+                                string(name: 'SchemaNamespace', value: "${values[2]}"), 
+                                string(name: 'SchemaFields', value: "${values[3]}"), 
+                                string(name: 'CompatibilityLevel', value: "${values[4]}"), 
+                                string(name: 'SchemaType', value: "${values[5]}"),
                                 string(name: 'ParamsAsENV', value: 'true,'),
-                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
+                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                             ]
 
-                            copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'create_result.txt')
+                            copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'schema_create_result.txt')
 
-                            def output = readFile('create_result.txt').trim()
+                            def output = readFile('schema_create_result.txt').trim()
                             echo "Creating output: ${output}"
 
-                            generateJUnitXML('create-topic', output.contains('Success') || output.contains('created'), 'Create Topic', output)
+                            generateJUnitXML('create-schema', output.contains('Success') || output.contains('created'), 'Create Schema', output)
                         }
                     }
                 }
@@ -196,64 +210,61 @@ Max Message Bytes (bytes) : ${values[5]}
                         script{
                             def option = "${Option}"
                             def values = option.split(',').collect { it.trim() }.findAll { it }
-                            if (values[2] == 'delete') {
-                                values[1] = "${values[1]},${values[2]}"
-                                
-                                values[2] = values[3]
-                                values[3] = values[4]
-                                values[4] = values[5]
-                                
-                                values = values.take(5)
-                            }
+                            
                             echo """
-Topic Name : ${values[0]}
-Cleanup Policy : ${values[1]}
-Retention Time (ms) : ${values[2]}
-Retention Size (bytes) : ${values[3]}
-Max Message Bytes (bytes) : ${values[4]}
+Subject Name : ${values[0]}
+Schema Name : ${values[1]}
+Schema Namespace : ${values[2]}
+Schema Fields : ${values[3]}
+Compatibility Level : ${values[4]}
+Schema Type : ${values[5]}
                             """
-                            def updateResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/update-topic', parameters: [
-                                string(name: 'TopicName', value: "${values[0]}"), 
-                                string(name: 'CleanupPolicy', value: "${values[1]}"), 
-                                string(name: 'RetentionTime', value: "${values[2]}"), 
-                                string(name: 'RetentionSize', value: "${values[3]}"), 
-                                string(name: 'MaxMessageBytes', value: "${values[4]}"),
+                            
+                            def updateResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-schema', parameters: [
+                                string(name: 'SubjectName', value: "${values[0]}"), 
+                                string(name: 'SchemaName', value: "${values[1]}"), 
+                                string(name: 'SchemaNamespace', value: "${values[2]}"), 
+                                string(name: 'SchemaFields', value: "${values[3]}"), 
+                                string(name: 'CompatibilityLevel', value: "${values[4]}"), 
+                                string(name: 'SchemaType', value: "${values[5]}"),
                                 string(name: 'ParamsAsENV', value: 'true,'),
-                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
+                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                             ]
 
-                            copyArtifacts(projectName: updateResult.projectName, selector: specific("${updateResult.number}"), filter: 'update_result.txt')
+                            copyArtifacts(projectName: updateResult.projectName, selector: specific("${updateResult.number}"), filter: 'schema_create_result.txt')
 
-                            def output = readFile('update_result.txt').trim()
+                            def output = readFile('schema_create_result.txt').trim()
                             echo "Update output: ${output}"
 
-                            generateJUnitXML('update-topic', output.contains('Success') || output.contains('updated'), 'Update Topic', output)
+                            generateJUnitXML('update-schema', output.contains('Success') || output.contains('updated'), 'Update Schema', output)
                         }
                     }
                 }
-                stage('Describe'){
+                stage('Get'){
                     when{
-                        expression {return params.Action == 'Describe'}
+                        expression {return params.Action == 'Get'}
                     }
                     steps{
                         script{
                             def option = "${Option}"
                             def values = option.split(',').collect { it.trim() }.findAll { it }
+                            
                             echo """
-Topic Name : ${values[0]}
+Subject Name : ${values[0]}
                             """
-                            def describeResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/describe-topic', parameters: [
-                                string(name: 'TopicName', value: "${values[0]}"),
+                            
+                            def getResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/get-schema', parameters: [
+                                string(name: 'Subject', value: "${values[0]}"),
                                 string(name: 'ParamsAsENV', value: 'true,'),
-                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
+                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                             ]
 
-                            copyArtifacts(projectName: describeResult.projectName, selector: specific("${describeResult.number}"), filter: 'describe_result.txt')
+                            copyArtifacts(projectName: getResult.projectName, selector: specific("${getResult.number}"), filter: 'get_schema_result.txt')
 
-                            def output = readFile('describe_result.txt').trim()
-                            echo "Describe output: ${output}"
+                            def output = readFile('get_schema_result.txt').trim()
+                            echo "Get output: ${output}"
 
-                            generateJUnitXML('describe-topic', output.contains("${values[0]}"), 'Describe Topic', output)
+                            generateJUnitXML('get-schema', output.contains("${values[0]}") || output.contains('1'), 'Get Schema', output)
                         }
                     }
                 }
@@ -263,9 +274,9 @@ Topic Name : ${values[0]}
                     }
                     steps{
                         script{
-                            def listResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/list-topic', parameters: [
+                            def listResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/list-schema', parameters: [
                                 string(name: 'ParamsAsENV', value: 'true,'),
-                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
+                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                             ]
 
                             copyArtifacts(projectName: listResult.projectName, selector: specific("${listResult.number}"), filter: 'list_result.txt')
@@ -273,7 +284,7 @@ Topic Name : ${values[0]}
                             def output = readFile('list_result.txt').trim()
                             echo "List output: ${output}"
 
-                            generateJUnitXML('list-topic', !output.toLowerCase().contains('error'), 'List Topic', output)
+                            generateJUnitXML('list-schema', !output.toLowerCase().contains('error'), 'List Schema', output)
                         }
                     }
                 }
@@ -287,21 +298,21 @@ Topic Name : ${values[0]}
                             def values = option.split(',').collect { it.trim() }.findAll { it }
                             echo env.confirmation
                             echo """
-Topic Name : ${values[0]}
+Subject Name : ${values[0]}
                             """
                             if (env.confirmation){
-                                def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-topic', parameters: [
-                                    string(name: 'TopicName', value: "${values[0]}"),
+                                def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-schema', parameters: [
+                                    string(name: 'Subject', value: "${values[0]}"),
                                     string(name: 'ParamsAsENV', value: 'true,'),
-                                    string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
+                                    string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                                 ]
 
-                                copyArtifacts(projectName: deleteResult.projectName, selector: specific("${deleteResult.number}"), filter: 'delete_result.txt')
+                                copyArtifacts(projectName: deleteResult.projectName, selector: specific("${deleteResult.number}"), filter: 'delete_schema_result.txt')
 
-                                def output = readFile('delete_result.txt').trim()
+                                def output = readFile('delete_schema_result.txt').trim()
                                 echo "Delete output: ${output}"
 
-                                generateJUnitXML('delete-topic', output.contains('Success') || output.contains('deleted'), 'Delete Topic', output)
+                                generateJUnitXML('delete-schema', output.contains('Success') || output.contains('deleted'), 'Delete Schema', output)
                             }
                         }
                     }
@@ -322,11 +333,11 @@ Topic Name : ${values[0]}
         }
         
         success {
-            echo 'All topic management tests passed successfully!'
+            echo 'All schema management tests passed successfully!'
         }
         
         failure {
-            echo 'Some topic management tests failed. Check the test results for details.'
+            echo 'Some schema management tests failed. Check the test results for details.'
         }
     }
 }
@@ -339,8 +350,8 @@ def generateJUnitXML(testName, passed, displayName, output) {
         </failure>"""
     
     def xmlContent = """<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="TopicManagementTests" tests="1" failures="${passed ? 0 : 1}" errors="0" time="1.0">
-    <testcase name="${testName}" classname="TopicManagement" time="1.0">
+<testsuite name="SchemaManagementTests" tests="1" failures="${passed ? 0 : 1}" errors="0" time="1.0">
+    <testcase name="${testName}" classname="SchemaManagement" time="1.0">
         <system-out><![CDATA[${output}]]></system-out>${failureElement}
     </testcase>
 </testsuite>"""
