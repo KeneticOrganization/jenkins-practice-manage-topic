@@ -70,16 +70,16 @@ pipeline {
         stage('Get Schema Testing'){
             steps{
                 script{
-                    def describeResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/get-schema', parameters: [
+                    def getSchemaResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/get-schema', parameters: [
                         string(name: 'Subject', value: 'test-subject'),
                         string(name: 'ParamsAsENV', value: 'true,'),
                         string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                     ]
 
-                    copyArtifacts(projectName: describeResult.projectName, selector: specific("${describeResult.number}"), filter: 'get_schema_result.txt')
+                    copyArtifacts(projectName: getSchemaResult.projectName, selector: specific("${getSchemaResult.number}"), filter: 'get_schema_result.txt')
 
                     def output = readFile('get_schema_result.txt').trim()
-                    echo "Describe output: ${output}"
+                    echo "Get Schema output: ${output}"
                     
                     // Generate JUnit XML for describe topic test
                     generateJUnitXML('describe-schema-test', output.contains('test-subject'), 'Get Schema Test', output)
@@ -123,7 +123,7 @@ pipeline {
                     def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-schema', parameters: [
                         string(name: 'Subject', value: 'test-subject'),
                         string(name: 'ParamsAsENV', value: 'true,'),
-                        string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
+                        string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                     ]
 
                     copyArtifacts(projectName: deleteResult.projectName, selector: specific("${deleteResult.number}"), filter: 'delete_schema_result.txt')
