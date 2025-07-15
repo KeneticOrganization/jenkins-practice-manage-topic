@@ -105,15 +105,15 @@ pipeline {
                     }
                     env.Auth = ""
                     env.Sort = "| jq -r '.schema' | jq ."
-                    if(env_params[2] == 'Cloud' || props?.CONNECTION_TYPE == 'Cloud'){
+                    if(env_params[1] == 'Cloud' || props?.CONNECTION_TYPE == 'Cloud'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_API_KEY\""
                     }
-                    else if (env_params[2] == 'Platform,RestAPI' || props?.CONNECTION_TYPE == 'Platform,RestAPI'){
+                    else if (env_params[1] == 'Platform,RestAPI' || props?.CONNECTION_TYPE == 'Platform,RestAPI'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                     }
                     env.HasTopic = "curl -s ${env.Auth} -H \"Content-Type: application/vnd.schemaregistry.v1+json\" --request GET --url \"${env.SCHEMA_REGISTRY_URL}/schemas?subjectPrefix=${params.Subject}\" | grep -c \"\\\"subject\\\":\\\"${params.Subject}\\\"\""
                     env.Command = "curl -s ${env.Auth} --request GET --url \"${env.SCHEMA_REGISTRY_URL}/subjects/${params.Subject}/versions/${params.SchemaVersion}\""
-                    if (env_params[2] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE == 'Platform,KafkaTools'){
+                    if (env_params[1] == 'Platform,KafkaTools' || props?.CONNECTION_TYPE == 'Platform,KafkaTools'){
                         env.Sort = ""
                         env.HasTopic = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --list --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties | grep -xq \"${params.TopicName}\""
                         env.Command = "${KAFKA_TOOLS_PATH}/bin/kafka-topics.sh --bootstrap-server ${BOOTSTRAP_SERVER} --describe --topic ${params.SchemaID} --command-config ${KAFKA_TOOLS_PATH}/config/kafka-config.properties"
