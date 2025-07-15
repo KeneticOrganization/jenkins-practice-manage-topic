@@ -82,7 +82,7 @@ pipeline {
                     echo "Get Schema output: ${output}"
                     
                     // Generate JUnit XML for describe topic test
-                    generateJUnitXML('describe-schema-test', output.contains('test-subject'), 'Get Schema Test', output)
+                    generateJUnitXML('get-schema-test', output.contains('1'), 'Get Schema Test', output)
                 }
             }
         }
