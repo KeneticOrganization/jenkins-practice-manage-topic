@@ -62,7 +62,7 @@ pipeline {
                     echo "List output: ${output}"
                     
                     // Generate JUnit XML for list schema test
-                    generateJUnitXML('list-schema-test', output.contains('test-topic'), 'List Schema Test', output)
+                    generateJUnitXML('list-schema-test', output.contains('test-subject'), 'List Schema Test', output)
                 }
             }
         }
@@ -71,9 +71,9 @@ pipeline {
             steps{
                 script{
                     def describeResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/get-schema', parameters: [
-                        string(name: 'TopicName', value: 'test-topic'),
+                        string(name: 'SubjectName', value: 'test-subject'),
                         string(name: 'ParamsAsENV', value: 'true,'),
-                        string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
+                        string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                     ]
 
                     copyArtifacts(projectName: describeResult.projectName, selector: specific("${describeResult.number}"), filter: 'describe_result.txt')
@@ -82,7 +82,7 @@ pipeline {
                     echo "Describe output: ${output}"
                     
                     // Generate JUnit XML for describe topic test
-                    generateJUnitXML('describe-topic-test', output.contains('test-topic'), 'Describe Topic Test', output)
+                    generateJUnitXML('describe-schema-test', output.contains('test-subject'), 'Get Schema Test', output)
                 }
             }
         }
@@ -91,13 +91,19 @@ pipeline {
             steps{
                 script{
                     def updateResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-schema', parameters: [
-                        string(name: 'TopicName', value: 'test-topic'), 
-                        string(name: 'CleanupPolicy', value: 'Delete'), 
-                        string(name: 'RetentionTime', value: '259200000'), 
-                        string(name: 'RetentionSize', value: '-1'), 
-                        string(name: 'MaxMessageBytes', value: '2097164'),
+                        string(name: 'SubjectName', value: 'test-subject'), 
+                        string(name: 'SchemaName', value: 'DefaultRecord'), 
+                        string(name: 'SchemaNamespace', value: 'com.test'), 
+                        string(name: 'SchemaFields', value: '''[
+    {"name": "id", "type": "string"},
+    {"name": "name", "type": "string"},
+    {"name": "timestamp", "type": "long"},
+    {"name": "value", "type": "int", "default": 0}
+]'''), 
+                        string(name: 'CompatibilityLevel', value: 'BACKWARD'), 
+                        string(name: 'SchemaType', value: 'AVRO'),
                         string(name: 'ParamsAsENV', value: 'true,'),
-                        string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
+                        string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                     ]
 
                     copyArtifacts(projectName: updateResult.projectName, selector: specific("${updateResult.number}"), filter: 'update_result.txt')
@@ -106,7 +112,7 @@ pipeline {
                     echo "Update output: ${output}"
                     
                     // Generate JUnit XML for update topic test
-                    generateJUnitXML('update-topic-test', output.contains('Success') || output.contains('updated'), 'Update Topic Test', output)
+                    generateJUnitXML('update-schema-test', output.contains('Success') || output.contains('updated'), 'Update Schema Test', output)
                 }
             }
         }
@@ -115,7 +121,7 @@ pipeline {
             steps{
                 script{
                     def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-schema', parameters: [
-                        string(name: 'TopicName', value: 'test-topic'),
+                        string(name: 'SubjectName', value: 'test-subject'),
                         string(name: 'ParamsAsENV', value: 'true,'),
                         string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
                     ]
@@ -126,7 +132,7 @@ pipeline {
                     echo "Delete output: ${output}"
                     
                     // Generate JUnit XML for delete topic test
-                    generateJUnitXML('delete-topic-test', output.contains('Success') || output.contains('deleted'), 'Delete Topic Test', output)
+                    generateJUnitXML('delete-schema-test', output.contains('Success') || output.contains('deleted'), 'Delete Schema Test', output)
                 }
             }
         }
