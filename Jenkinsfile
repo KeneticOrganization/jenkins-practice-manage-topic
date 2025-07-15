@@ -18,7 +18,7 @@ properties([
                     classpath: [], 
                     sandbox: true, 
                     script: 
-                        '''return["Create","Update","Get","List:selected","Delete"]'''
+                        '''return["Create/Update","Get","List:selected","Delete"]'''
                 ]
             ]
         ], 
@@ -44,7 +44,7 @@ properties([
                         '''
                         if (Action == 'List'){
                             return "<label>This action didn't need any options.</label>"
-                        } else if (Action == 'Create') {
+                        } else if (Action == 'Create/Update') {
                             return """
                                 <table>
                                 <tr>
@@ -52,6 +52,8 @@ properties([
                                 <td><label>Subject Name</label><br><input name='value' type='text' value='test-subject'></td>
                                 <td><label>Schema Name</label><br><input name='value' type='text' value='DefaultRecord'></td>
                                 <td><label>Schema Namespace</label><br><input name='value' type='text' value='com.test'></td>
+                                </tr>
+                                <tr>
                                 <td><label>Compat Level</label><br>
                                 <select name='value'>
                                     <option value='BACKWARD' selected>BACKWARD</option>
@@ -64,6 +66,11 @@ properties([
                                     <option value='AVRO' selected>AVRO</option>
                                     <option value='JSON'>JSON</option>
                                     <option value='PROTOBUF'>PROTOBUF</option>
+                                </select></td>
+                                <td><label>Operation</label><br>
+                                <select name='value'>
+                                    <option value='CREATE' selected>CREATE</option>
+                                    <option value='UPDATE'>UPDATE</option>
                                 </select></td>
                                 </tr>
                                 <tr>
@@ -71,37 +78,6 @@ properties([
     {"name": "id", "type": "string"},
     {"name": "name", "type": "string"},
     {"name": "timestamp", "type": "long"}
-]</textarea></td>
-                                </tr>
-                                </table>
-                            """
-                        } else if (Action == 'Update') {
-                            return """
-                                <table>
-                                <tr>
-                                <td><label>Subject Name</label><br><input name='value' type='text' value='test-subject'></td>
-                                <td><label>Schema Name</label><br><input name='value' type='text' value='DefaultRecord'></td>
-                                <td><label>Schema Namespace</label><br><input name='value' type='text' value='com.test'></td>
-                                <td><label>Compat Level</label><br>
-                                <select name='value'>
-                                    <option value='BACKWARD' selected>BACKWARD</option>
-                                    <option value='FORWARD'>FORWARD</option>
-                                    <option value='FULL'>FULL</option>
-                                    <option value='NONE'>NONE</option>
-                                </select></td>
-                                <td><label>Schema Type</label><br>
-                                <select name='value'>
-                                    <option value='AVRO' selected>AVRO</option>
-                                    <option value='JSON'>JSON</option>
-                                    <option value='PROTOBUF'>PROTOBUF</option>
-                                </select></td>
-                                </tr>
-                                <tr>
-                                <td colspan='5'><label>Schema Fields</label><br><textarea name='value' rows='8' cols='80' style='width: 100%;'>[
-    {"name": "id", "type": "string"},
-    {"name": "name", "type": "string"},
-    {"name": "timestamp", "type": "long"},
-    {"name": "value", "type": "int", "default": 0}
 ]</textarea></td>
                                 </tr>
                                 </table>
@@ -172,9 +148,9 @@ pipeline {
         }
         stage('Schema Management') {
             parallel{
-                stage('Create'){
+                stage('Create/Update'){
                     when{
-                        expression {return params.Action == 'Create'}
+                        expression {return params.Action == 'Create/Update'}
                     }
                     steps{
                         script{
@@ -233,7 +209,12 @@ pipeline {
                                 }
                             }
                             
+                            // Extract operation type from values
+                            def operation = values[5] // Operation is the 6th value (index 5)
+                            def actionType = operation.toLowerCase()
+                            
                             echo """
+Operation: ${operation}
 Subject Name : ${values[0]}
 Schema Name : ${values[1]}
 Schema Namespace : ${values[2]}
@@ -242,7 +223,7 @@ Compatibility Level : ${values[3]}
 Schema Type : ${values[4]}
                             """
                             
-                            def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-schema', parameters: [
+                            def jobResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-schema', parameters: [
                                 string(name: 'SubjectName', value: "${values[0]}"), 
                                 string(name: 'SchemaName', value: "${values[1]}"), 
                                 string(name: 'SchemaNamespace', value: "${values[2]}"), 
@@ -253,50 +234,17 @@ Schema Type : ${values[4]}
                                 string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                             ]
 
-                            copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'schema_create_result.txt')
+                            copyArtifacts(projectName: jobResult.projectName, selector: specific("${jobResult.number}"), filter: 'schema_create_result.txt')
 
                             def output = readFile('schema_create_result.txt').trim()
-                            echo "Creating output: ${output}"
+                            echo "${operation} output: ${output}"
 
-                            generateJUnitXML('create-schema', output.contains('Success') || output.contains('created'), 'Create Schema', output)
-                        }
-                    }
-                }
-                stage('Update'){
-                    when{
-                        expression {return params.Action == 'Update'}
-                    }
-                    steps{
-                        script{
-                            def option = "${Option}"
-                            def values = option.split(',').collect { it.trim() }.findAll { it }
+                            // Generate test result based on operation type
+                            def testName = actionType == 'create' ? 'create-schema' : 'update-schema'
+                            def displayName = actionType == 'create' ? 'Create Schema' : 'Update Schema'
+                            def success = output.contains('Success') || output.contains('created') || output.contains('updated')
                             
-                            echo """
-Subject Name : ${values[0]}
-Schema Name : ${values[1]}
-Schema Namespace : ${values[2]}
-Schema Fields : ${values[3]}
-Compatibility Level : ${values[4]}
-Schema Type : ${values[5]}
-                            """
-                            
-                            def updateResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-schema', parameters: [
-                                string(name: 'SubjectName', value: "${values[0]}"), 
-                                string(name: 'SchemaName', value: "${values[1]}"), 
-                                string(name: 'SchemaNamespace', value: "${values[2]}"), 
-                                string(name: 'SchemaFields', value: "${values[3]}"), 
-                                string(name: 'CompatibilityLevel', value: "${values[4]}"), 
-                                string(name: 'SchemaType', value: "${values[5]}"),
-                                string(name: 'ParamsAsENV', value: 'true,'),
-                                string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
-                            ]
-
-                            copyArtifacts(projectName: updateResult.projectName, selector: specific("${updateResult.number}"), filter: 'schema_create_result.txt')
-
-                            def output = readFile('schema_create_result.txt').trim()
-                            echo "Update output: ${output}"
-
-                            generateJUnitXML('update-schema', output.contains('Success') || output.contains('updated'), 'Update Schema', output)
+                            generateJUnitXML(testName, success, displayName, output)
                         }
                     }
                 }
