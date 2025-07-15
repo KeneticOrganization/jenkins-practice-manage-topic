@@ -228,9 +228,9 @@ pipeline {
 Subject Name : ${values[0]}
 Schema Name : ${values[1]}
 Schema Namespace : ${values[2]}
-Schema Fields : ${values[3]}
-Compatibility Level : ${values[4]}
-Schema Type : ${jsons[0]}
+Schema Fields : ${jsons[0]}
+Compatibility Level : ${values[3]}
+Schema Type : ${values[4]}
                             """
                             
                             def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-schema', parameters: [
