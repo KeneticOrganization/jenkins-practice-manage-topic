@@ -71,7 +71,7 @@ pipeline {
             steps{
                 script{
                     def describeResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/get-schema', parameters: [
-                        string(name: 'SubjectName', value: 'test-subject'),
+                        string(name: 'Subject', value: 'test-subject'),
                         string(name: 'ParamsAsENV', value: 'true,'),
                         string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                     ]
@@ -121,7 +121,7 @@ pipeline {
             steps{
                 script{
                     def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-schema', parameters: [
-                        string(name: 'SubjectName', value: 'test-subject'),
+                        string(name: 'Subject', value: 'test-subject'),
                         string(name: 'ParamsAsENV', value: 'true,'),
                         string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
                     ]
