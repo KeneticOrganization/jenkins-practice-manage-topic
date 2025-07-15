@@ -138,6 +138,7 @@ pipeline {
                             if ${env.HasTopic} ; then
                                 RESPONSE=\$(${env.Command})
                                 echo "\$RESPONSE" ${env.Sort}
+                                echo "Success."
                             else
                                 echo "Unknown Schema subjects \"${params.Subject}\"."
                             fi
