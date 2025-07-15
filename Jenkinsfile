@@ -180,6 +180,8 @@ pipeline {
                         script{
                             def option = "${Option}"
 
+                            echo option
+
                             def parts = []
                             def current = new StringBuilder()
                             int braceCount = 0
