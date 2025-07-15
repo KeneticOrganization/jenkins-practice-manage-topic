@@ -9,10 +9,10 @@ pipeline {
                 script{
                     def props = readProperties file: 'env.properties'
                     if(props.CONNECTION_TYPE == 'Platform,KafkaTools'){
-                        env.params_1 = props.BOOTSTRAP_SERVER.replaceAll(",", ";")
+                        env.params_1 = props.SCHEMA_REGISTRY_URL.replaceAll(",", ";")
                     }
                     else{
-                        env.params_1 = props.REST_ENDPOINT
+                        env.params_1 = props.SCHEMA_REGISTRY_URL
                     }
                     env.CONNECTION_TYPE = props.CONNECTION_TYPE.replaceAll(",", ";")
                 }
