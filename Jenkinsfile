@@ -203,7 +203,6 @@ pipeline {
                             }
                             
                             echo """
-Operation: ${operation}
 Subject Name : ${values[0]}
 Schema Name : ${values[1]}
 Schema Namespace : ${values[2]}
@@ -228,7 +227,6 @@ Schema Type : ${values[4]}
                             def output = readFile('schema_create_result.txt').trim()
                             echo "output: ${output}"
 
-                            // Generate test result based on operation type
                             def testName = 'create-schema'
                             def displayName = actionType == 'create' ? 'Create Schema' : 'Update Schema'
                             def success = output.contains('Success') || output.contains('created') || output.contains('updated')
