@@ -213,7 +213,7 @@ pipeline {
                             }
 
                             def jsons = []
-                            def others = []
+                            def values = []
 
                             parts.each {
                                 def trimmed = it.trim()
