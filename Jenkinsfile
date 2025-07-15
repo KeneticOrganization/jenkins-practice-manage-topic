@@ -76,9 +76,9 @@ pipeline {
                         string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                     ]
 
-                    copyArtifacts(projectName: describeResult.projectName, selector: specific("${describeResult.number}"), filter: 'describe_result.txt')
+                    copyArtifacts(projectName: describeResult.projectName, selector: specific("${describeResult.number}"), filter: 'get_schema_result.txt')
 
-                    def output = readFile('describe_result.txt').trim()
+                    def output = readFile('get_schema_result.txt').trim()
                     echo "Describe output: ${output}"
                     
                     // Generate JUnit XML for describe topic test
@@ -106,9 +106,9 @@ pipeline {
                         string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                     ]
 
-                    copyArtifacts(projectName: updateResult.projectName, selector: specific("${updateResult.number}"), filter: 'update_result.txt')
+                    copyArtifacts(projectName: updateResult.projectName, selector: specific("${updateResult.number}"), filter: 'schema_create_result.txt')
 
-                    def output = readFile('update_result.txt').trim()
+                    def output = readFile('schema_create_result.txt').trim()
                     echo "Update output: ${output}"
                     
                     // Generate JUnit XML for update topic test
@@ -126,9 +126,9 @@ pipeline {
                         string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
                     ]
 
-                    copyArtifacts(projectName: deleteResult.projectName, selector: specific("${deleteResult.number}"), filter: 'delete_result.txt')
+                    copyArtifacts(projectName: deleteResult.projectName, selector: specific("${deleteResult.number}"), filter: 'delete_schema_result.txt')
 
-                    def output = readFile('delete_result.txt').trim()
+                    def output = readFile('delete_schema_result.txt').trim()
                     echo "Delete output: ${output}"
                     
                     // Generate JUnit XML for delete topic test
