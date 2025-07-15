@@ -180,8 +180,6 @@ pipeline {
                         script{
                             def option = "${Option}"
 
-                            echo option
-
                             def parts = []
                             def current = new StringBuilder()
                             int curlyBraces = 0
@@ -224,10 +222,19 @@ pipeline {
                                 def trimmed = val.trim()
                                 if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || 
                                     (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
-                                    jsons << trimmed
+                                        def cleaned = trimmed
+                                        .replaceAll('\\\\n', ' ')
+                                        .replaceAll('\\\\\"', '"')
+                                        .replaceAll('\\s+', ' ')
+                                        .trim()
+                                        jsons << trimcleanedmed
                                 } else {
                                     values << trimmed
                                 }
+                            }
+
+                            for (def json in) {
+
                             }
                             
                             echo """
