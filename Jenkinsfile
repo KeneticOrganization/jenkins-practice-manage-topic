@@ -66,6 +66,8 @@ properties([
                                     <option value='PROTOBUF'>PROTOBUF</option>
                                 </select></td>
                                 </tr>
+                                </table>
+                                <table>
                                 <tr>
                                 <td colspan='6'><label>Schema Fields</label><br><textarea name='value' rows='8' cols='80' style='width: 100%;'>[
     {"name": "id", "type": "string"},
