@@ -49,17 +49,17 @@ properties([
                                 <table>
                                 <tr>
                                 <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="width: 150px; height: auto; border: 2px solid #555; border-radius: 10px;">
-                                <td><label>Subject Name</label><input name='value' type='text' value='test-subject'></td>
-                                <td><label>Schema Name</label><input name='value' type='text' value='DefaultRecord'></td>
-                                <td><label>Schema Namespace</label><input name='value' type='text' value='com.test'></td>
-                                <td><label>Compat Level</label>
+                                <td><label>Subject Name</label><br><input name='value' type='text' value='test-subject'></td>
+                                <td><label>Schema Name</label><br><input name='value' type='text' value='DefaultRecord'></td>
+                                <td><label>Schema Namespace</label><br><input name='value' type='text' value='com.test'></td>
+                                <td><label>Compat Level</label><br>
                                 <select name='value'>
                                     <option value='BACKWARD' selected>BACKWARD</option>
                                     <option value='FORWARD'>FORWARD</option>
                                     <option value='FULL'>FULL</option>
                                     <option value='NONE'>NONE</option>
                                 </select></td>
-                                <td><label>Schema Type</label>
+                                <td><label>Schema Type</label><br>
                                 <select name='value'>
                                     <option value='AVRO' selected>AVRO</option>
                                     <option value='JSON'>JSON</option>
@@ -79,17 +79,17 @@ properties([
                             return """
                                 <table>
                                 <tr>
-                                <td><label>Subject Name</label><input name='value' type='text' value='test-subject'></td>
-                                <td><label>Schema Name</label><input name='value' type='text' value='DefaultRecord'></td>
-                                <td><label>Schema Namespace</label><input name='value' type='text' value='com.test'></td>
-                                <td><label>Compat Level</label>
+                                <td><label>Subject Name</label><br><input name='value' type='text' value='test-subject'></td>
+                                <td><label>Schema Name</label><br><input name='value' type='text' value='DefaultRecord'></td>
+                                <td><label>Schema Namespace</label><br><input name='value' type='text' value='com.test'></td>
+                                <td><label>Compat Level</label><br>
                                 <select name='value'>
                                     <option value='BACKWARD' selected>BACKWARD</option>
                                     <option value='FORWARD'>FORWARD</option>
                                     <option value='FULL'>FULL</option>
                                     <option value='NONE'>NONE</option>
                                 </select></td>
-                                <td><label>Schema Type</label>
+                                <td><label>Schema Type</label><br>
                                 <select name='value'>
                                     <option value='AVRO' selected>AVRO</option>
                                     <option value='JSON'>JSON</option>
@@ -111,7 +111,7 @@ properties([
                         } else {
                             return """
                                 <table><tr>
-                                <td><label>Subject Name : </label><input name='value' type='text' value='test-subject'></td>
+                                <td><label>Subject Name : </label><br><input name='value' type='text' value='test-subject'></td>
                                 </tr></table>
                             """
                         }
