@@ -52,8 +52,6 @@ properties([
                                 <td><label>Subject Name</label><br><input name='value' type='text' value='test-subject'></td>
                                 <td><label>Schema Name</label><br><input name='value' type='text' value='DefaultRecord'></td>
                                 <td><label>Schema Namespace</label><br><input name='value' type='text' value='com.test'></td>
-                                </tr>
-                                <tr>
                                 <td><label>Compat Level</label><br>
                                 <select name='value'>
                                     <option value='BACKWARD' selected>BACKWARD</option>
@@ -66,11 +64,6 @@ properties([
                                     <option value='AVRO' selected>AVRO</option>
                                     <option value='JSON'>JSON</option>
                                     <option value='PROTOBUF'>PROTOBUF</option>
-                                </select></td>
-                                <td><label>Operation</label><br>
-                                <select name='value'>
-                                    <option value='CREATE' selected>CREATE</option>
-                                    <option value='UPDATE'>UPDATE</option>
                                 </select></td>
                                 </tr>
                                 <tr>
