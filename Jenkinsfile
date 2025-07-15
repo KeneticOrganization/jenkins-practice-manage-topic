@@ -227,7 +227,7 @@ pipeline {
                                         .replaceAll('\\\\\"', '"')
                                         .replaceAll('\\s+', ' ')
                                         .trim()
-                                        jsons << trimcleanedmed
+                                        jsons << cleaned
                                 } else {
                                     values << trimmed
                                 }
