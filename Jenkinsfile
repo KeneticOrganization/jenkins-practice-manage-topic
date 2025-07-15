@@ -46,17 +46,13 @@ properties([
                             return "<label>This action didn't need any options.</label>"
                         } else if (Action == 'Create') {
                             return """
-                                <table><tr>
-                                <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="width: 300px; height: auto; border: 2px solid #555; border-radius: 10px;">
+                                <table>
+                                <tr>
+                                <img src="https://www.mfec.co.th/wp-content/uploads/2023/09/New-Logo-MFEC-More.-2023.jpg" style="width: 150px; height: auto; border: 2px solid #555; border-radius: 10px;">
                                 <td><label>Subject Name</label><input name='value' type='text' value='test-subject'></td>
                                 <td><label>Schema Name</label><input name='value' type='text' value='DefaultRecord'></td>
                                 <td><label>Schema Namespace</label><input name='value' type='text' value='com.test'></td>
-                                <td><label>Schema Fields</label><textarea name='value' rows='5' cols='50'>[
-    {"name": "id", "type": "string"},
-    {"name": "name", "type": "string"},
-    {"name": "timestamp", "type": "long"}
-]</textarea></td>
-                                <td><label>Compatibility Level</label>
+                                <td><label>Compat Level</label>
                                 <select name='value'>
                                     <option value='BACKWARD' selected>BACKWARD</option>
                                     <option value='FORWARD'>FORWARD</option>
@@ -69,34 +65,46 @@ properties([
                                     <option value='JSON'>JSON</option>
                                     <option value='PROTOBUF'>PROTOBUF</option>
                                 </select></td>
-                                </tr></table>
+                                </tr>
+                                <tr>
+                                <td colspan='6'><label>Schema Fields</label><br><textarea name='value' rows='8' cols='80' style='width: 100%;'>[
+    {"name": "id", "type": "string"},
+    {"name": "name", "type": "string"},
+    {"name": "timestamp", "type": "long"}
+]</textarea></td>
+                                </tr>
+                                </table>
                             """
                         } else if (Action == 'Update') {
                             return """
-                                <table><tr>
+                                <table>
+                                <tr>
                                 <td><label>Subject Name</label><input name='value' type='text' value='test-subject'></td>
                                 <td><label>Schema Name</label><input name='value' type='text' value='DefaultRecord'></td>
                                 <td><label>Schema Namespace</label><input name='value' type='text' value='com.test'></td>
-                                <td><label>Schema Fields</label><textarea name='value' rows='5' cols='50'>[
+                                <td><label>Compat Level</label>
+                                <select name='value'>
+                                    <option value='BACKWARD' selected>BACKWARD</option>
+                                    <option value='FORWARD'>FORWARD</option>
+                                    <option value='FULL'>FULL</option>
+                                    <option value='NONE'>NONE</option>
+                                </select></td>
+                                <td><label>Schema Type</label>
+                                <select name='value'>
+                                    <option value='AVRO' selected>AVRO</option>
+                                    <option value='JSON'>JSON</option>
+                                    <option value='PROTOBUF'>PROTOBUF</option>
+                                </select></td>
+                                </tr>
+                                <tr>
+                                <td colspan='5'><label>Schema Fields</label><br><textarea name='value' rows='8' cols='80' style='width: 100%;'>[
     {"name": "id", "type": "string"},
     {"name": "name", "type": "string"},
     {"name": "timestamp", "type": "long"},
     {"name": "value", "type": "int", "default": 0}
 ]</textarea></td>
-                                <td><label>Compatibility Level</label>
-                                <select name='value'>
-                                    <option value='BACKWARD' selected>BACKWARD</option>
-                                    <option value='FORWARD'>FORWARD</option>
-                                    <option value='FULL'>FULL</option>
-                                    <option value='NONE'>NONE</option>
-                                </select></td>
-                                <td><label>Schema Type</label>
-                                <select name='value'>
-                                    <option value='AVRO' selected>AVRO</option>
-                                    <option value='JSON'>JSON</option>
-                                    <option value='PROTOBUF'>PROTOBUF</option>
-                                </select></td>
-                                </tr></table>
+                                </tr>
+                                </table>
                             """
                         } else if (Action == 'MANAGE_SCHEMA:ERROR') {
                             return['MANAGE_SCHEMA:ERROR']
