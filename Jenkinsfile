@@ -226,7 +226,7 @@ Schema Type : ${values[4]}
                             copyArtifacts(projectName: jobResult.projectName, selector: specific("${jobResult.number}"), filter: 'schema_create_result.txt')
 
                             def output = readFile('schema_create_result.txt').trim()
-                            echo "${operation} output: ${output}"
+                            echo "output: ${output}"
 
                             // Generate test result based on operation type
                             def testName = 'create-schema'
