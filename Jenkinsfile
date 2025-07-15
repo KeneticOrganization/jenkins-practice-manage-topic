@@ -8,6 +8,11 @@ pipeline {
             steps{
                 script{
                     def props = readProperties file: 'env.properties'
+                    def oldFile = 'describe-schema-test.xml'
+                    if (fileExists(oldFile)) {
+                        echo "Deleting old artifact: ${oldFile}"
+                        sh "rm -f ${oldFile}"
+                    }
                     if(props.CONNECTION_TYPE == 'Platform,KafkaTools'){
                         env.params_1 = props.SCHEMA_REGISTRY_URL.replaceAll(",", ";")
                     }
