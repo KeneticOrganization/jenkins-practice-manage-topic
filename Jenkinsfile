@@ -228,7 +228,7 @@ Schema Type : ${values[4]}
                             echo "output: ${output}"
 
                             def testName = 'create-schema'
-                            def displayName = actionType == 'create' ? 'Create Schema' : 'Update Schema'
+                            def displayName = 'Create/Update Schema'
                             def success = output.contains('Success') || output.contains('created') || output.contains('updated')
                             
                             generateJUnitXML(testName, success, displayName, output)
