@@ -96,13 +96,13 @@ pipeline {
                     if (UseParamsAsENV[0] != 'true') {
                         props = readProperties file: 'env.properties'
                     }
-                    else if (env_params[2] != 'Cloud'){
+                    else if (env_params[1] != 'Cloud'){
                         env_params[0] = env_params[0].replaceAll(";", ",")
-                        env_params[2] = env_params[2].replaceAll(";", ",")
+                        env_params[1] = env_params[1].replaceAll(";", ",")
                     }
 
                     if (UseParamsAsENV[0] == 'true'){
-                        if (env_params[2] == 'Platform,KafkaTools') {
+                        if (env_params[1] == 'Platform,KafkaTools') {
                             env.SCHEMA_REGISTRY_URL = env_params[0]
                             env.KAFKA_TOOLS_PATH = env_params[1]
                         }
@@ -124,10 +124,10 @@ pipeline {
                     env.Auth = ""
                     env.Sort = "| jq '.'"
                     
-                    if(env_params[2] == 'Cloud' || props?.CONNECTION_TYPE == 'Cloud'){
+                    if(env_params[1] == 'Cloud' || props?.CONNECTION_TYPE == 'Cloud'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CC_API_KEY\""
                     }
-                    else if (env_params[2] == 'Platform,RestAPI' || props?.CONNECTION_TYPE == 'Platform,RestAPI'){
+                    else if (env_params[1] == 'Platform,RestAPI' || props?.CONNECTION_TYPE == 'Platform,RestAPI'){
                         env.Auth = env.Auth + " -H \"Authorization: Basic \$CP_API_KEY\""
                     }
 
