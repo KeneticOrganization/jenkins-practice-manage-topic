@@ -246,9 +246,9 @@ Schema Type : ${values[4]}
                                 string(name: 'SubjectName', value: "${values[0]}"), 
                                 string(name: 'SchemaName', value: "${values[1]}"), 
                                 string(name: 'SchemaNamespace', value: "${values[2]}"), 
-                                string(name: 'SchemaFields', value: "${values[3]}"), 
-                                string(name: 'CompatibilityLevel', value: "${values[4]}"), 
-                                string(name: 'SchemaType', value: "${values[5]}"),
+                                string(name: 'SchemaFields', value: "${jsons[0]}"), 
+                                string(name: 'CompatibilityLevel', value: "${values[3]}"), 
+                                string(name: 'SchemaType', value: "${values[4]}"),
                                 string(name: 'ParamsAsENV', value: 'true,'),
                                 string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                             ]
