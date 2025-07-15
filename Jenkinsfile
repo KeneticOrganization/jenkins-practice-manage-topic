@@ -180,46 +180,48 @@ pipeline {
                         script{
                             def option = "${Option}"
 
-                            echo option
-
                             def parts = []
                             def current = new StringBuilder()
-                            int braceCount = 0
+                            int curlyBraces = 0
+                            int squareBrackets = 0
 
                             for (int i = 0; i < option.length(); i++) {
                                 char c = option.charAt(i)
 
                                 if (c == '{') {
-                                    braceCount++
+                                    curlyBraces++
                                     current.append(c)
                                 } else if (c == '}') {
-                                    braceCount--
+                                    curlyBraces--
                                     current.append(c)
-                                    if (braceCount == 0) {
-                                        // End of JSON block
-                                        parts << current.toString().trim()
-                                        current.setLength(0)
-                                    }
-                                } else if (c == ',' && braceCount == 0) {
-                                    if (current.length() > 0) {
-                                        parts << current.toString().trim()
-                                        current.setLength(0)
-                                    }
+                                } else if (c == '[') {
+                                    squareBrackets++
+                                    current.append(c)
+                                } else if (c == ']') {
+                                    squareBrackets--
+                                    current.append(c)
+                                } else if (c == ',' && curlyBraces == 0 && squareBrackets == 0) {
+                                    // Split outside of both {} and []
+                                    parts << current.toString().trim()
+                                    current.setLength(0)
                                 } else {
                                     current.append(c)
                                 }
                             }
 
+                            // Add last part
                             if (current.length() > 0) {
                                 parts << current.toString().trim()
                             }
 
+                            // Now categorize parts
                             def jsons = []
                             def values = []
 
-                            parts.each {
-                                def trimmed = it.trim()
-                                if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+                            parts.each { val ->
+                                def trimmed = val.trim()
+                                if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || 
+                                    (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
                                     jsons << trimmed
                                 } else {
                                     values << trimmed
