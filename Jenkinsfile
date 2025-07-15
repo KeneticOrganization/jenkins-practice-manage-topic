@@ -232,10 +232,6 @@ pipeline {
                                     values << trimmed
                                 }
                             }
-
-                            for (def json in) {
-
-                            }
                             
                             echo """
 Subject Name : ${values[0]}
