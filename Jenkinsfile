@@ -10,29 +10,31 @@ pipeline {
                     def props = readProperties file: 'env.properties'
                     if(props.CONNECTION_TYPE == 'Platform,KafkaTools'){
                         env.params_1 = props.BOOTSTRAP_SERVER.replaceAll(",", ";")
-                        env.params_2 = props.KAFKA_TOOLS_PATH
                     }
                     else{
                         env.params_1 = props.REST_ENDPOINT
-                        env.params_2 = props.CLUSTER_ID
                     }
                     env.CONNECTION_TYPE = props.CONNECTION_TYPE.replaceAll(",", ";")
                 }
             }
         }
         
-        stage('Creating Topic Testing'){
+        stage('Creating Schema Testing'){
             steps{
                 script{
                     def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-topic-Jenkins', parameters: [
-                        string(name: 'TopicName', value: 'test-topic'), 
-                        string(name: 'Partitions', value: '6'), 
-                        string(name: 'CleanupPolicy', value: 'Compact'), 
-                        string(name: 'RetentionTime', value: '604800000'), 
-                        string(name: 'RetentionSize', value: '-1'), 
-                        string(name: 'MaxMessageBytes', value: '2097164'),
+                        string(name: 'SubjectName', value: 'test-subject'), 
+                        string(name: 'SchemaName', value: 'DefaultRecord'), 
+                        string(name: 'SchemaNamespace', value: 'com.test'), 
+                        string(name: 'SchemaFields', value: '''[
+    {"name": "id", "type": "string"},
+    {"name": "name", "type": "string"},
+    {"name": "timestamp", "type": "long"}
+]'''), 
+                        string(name: 'CompatibilityLevel', value: 'BACKWARD'), 
+                        string(name: 'SchemaType', value: 'AVRO'),
                         string(name: 'ParamsAsENV', value: 'true,'),
-                        string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${params_2},${CONNECTION_TYPE},")
+                        string(name: 'ENVIRONMENT_PARAMS', value: "${params_1},${CONNECTION_TYPE},")
                     ]
 
                     copyArtifacts(projectName: createResult.projectName, selector: specific("${createResult.number}"), filter: 'create_result.txt')
@@ -46,7 +48,7 @@ pipeline {
             }
         }
 
-        stage('List Topic Testing'){
+        stage('List Schema Testing'){
             steps{
                 script{
                     def listResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/list-topic', parameters: [
@@ -65,7 +67,7 @@ pipeline {
             }
         }
 
-        stage('Describe Topic Testing'){
+        stage('Get Schema Testing'){
             steps{
                 script{
                     def describeResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/describe-topic', parameters: [
@@ -85,7 +87,7 @@ pipeline {
             }
         }
         
-        stage('Update Topic Testing'){
+        stage('Update Schema Testing'){
             steps{
                 script{
                     def updateResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/update-topic', parameters: [
@@ -109,7 +111,7 @@ pipeline {
             }
         }
         
-        stage('Delete Topic Testing'){
+        stage('Delete Schema Testing'){
             steps{
                 script{
                     def deleteResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/delete-topic', parameters: [
