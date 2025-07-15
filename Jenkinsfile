@@ -179,7 +179,50 @@ pipeline {
                     steps{
                         script{
                             def option = "${Option}"
-                            def values = option.split(',').collect { it.trim() }.findAll { it }
+
+                            def parts = []
+                            def current = new StringBuilder()
+                            int braceCount = 0
+
+                            for (int i = 0; i < option.length(); i++) {
+                                char c = option.charAt(i)
+
+                                if (c == '{') {
+                                    braceCount++
+                                    current.append(c)
+                                } else if (c == '}') {
+                                    braceCount--
+                                    current.append(c)
+                                    if (braceCount == 0) {
+                                        // End of JSON block
+                                        parts << current.toString().trim()
+                                        current.setLength(0)
+                                    }
+                                } else if (c == ',' && braceCount == 0) {
+                                    if (current.length() > 0) {
+                                        parts << current.toString().trim()
+                                        current.setLength(0)
+                                    }
+                                } else {
+                                    current.append(c)
+                                }
+                            }
+
+                            if (current.length() > 0) {
+                                parts << current.toString().trim()
+                            }
+
+                            def jsons = []
+                            def others = []
+
+                            parts.each {
+                                def trimmed = it.trim()
+                                if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+                                    jsons << trimmed
+                                } else {
+                                    values << trimmed
+                                }
+                            }
                             
                             echo """
 Subject Name : ${values[0]}
@@ -187,7 +230,7 @@ Schema Name : ${values[1]}
 Schema Namespace : ${values[2]}
 Schema Fields : ${values[3]}
 Compatibility Level : ${values[4]}
-Schema Type : ${values[5]}
+Schema Type : ${jsons[0]}
                             """
                             
                             def createResult = build job: 'Jenkins Practice/jenkins-practice-manage-topic/create-schema', parameters: [
