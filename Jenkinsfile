@@ -202,10 +202,6 @@ pipeline {
                                 }
                             }
                             
-                            // Extract operation type from values
-                            def operation = values[5] // Operation is the 6th value (index 5)
-                            def actionType = operation.toLowerCase()
-                            
                             echo """
 Operation: ${operation}
 Subject Name : ${values[0]}
@@ -233,7 +229,7 @@ Schema Type : ${values[4]}
                             echo "${operation} output: ${output}"
 
                             // Generate test result based on operation type
-                            def testName = actionType == 'create' ? 'create-schema' : 'update-schema'
+                            def testName = 'create-schema'
                             def displayName = actionType == 'create' ? 'Create Schema' : 'Update Schema'
                             def success = output.contains('Success') || output.contains('created') || output.contains('updated')
                             
